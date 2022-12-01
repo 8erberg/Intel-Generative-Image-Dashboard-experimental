@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd 
-import numpy as np 
+import numpy as np
+from PIL import Image
 
 # Setup
 ## Load prompt directory
@@ -16,7 +17,8 @@ manual_prompts = prompt_dir.ID.tolist()
 # Page
 st.title('Generative Image Benchmark')
 st.write('This is an evaluation platform to assess the performance of image generation algorithms developed by Intel Labs. This is the alpha version of the platform and still in development. Refer to the following link for a user guide: https://github.com/8erberg/Intel-Generative-Image-Dashboard/blob/main/README.md')
-st.sidebar.image('Graphics/IL_Logo.png')
+side_image = Image.open('Graphics/IL_Logo.png')
+st.sidebar.image(side_image)
 
 
 # Generate empty dataset for results, if it does not exist yet

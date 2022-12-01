@@ -15,7 +15,8 @@ fun_dict = {
 st.title('Automated Assessment')
 st.write('On this page you can use automated assessment algorithms to assess how good uploaded images match their respective prompts.')
 st.write(' ')
-st.sidebar.image('Graphics/IL_Logo.png')
+side_image = Image.open('Graphics/IL_Logo.png')
+st.sidebar.image(side_image)
 
 try:
     # Create necessary variables

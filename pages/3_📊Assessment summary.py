@@ -2,7 +2,9 @@ import streamlit as st
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-st.sidebar.image('Graphics/IL_Logo.png')
+from PIL import Image
+side_image = Image.open('Graphics/IL_Logo.png')
+st.sidebar.image(side_image)
 
 @st.cache
 def convert_df_to_csv(df):
