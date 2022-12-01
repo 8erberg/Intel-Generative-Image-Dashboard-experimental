@@ -2,14 +2,14 @@ import streamlit as st
 import numpy as np
 from itertools import compress
 from PIL import Image
-from pages.Functions.Assessment_functions import CLIP_single_object_classifier, CLIP_multi_object_recognition_DSwrapper, CLIP_object_negation
+from pages.Functions.Assessment_functions import Empty_DSwrapper
 
 
 # Create dictionary to hold functions
 fun_dict = {
-    'Multiple object types':CLIP_multi_object_recognition_DSwrapper, 
-    'Single object':CLIP_single_object_classifier,
-    'Negation':CLIP_object_negation}
+    'Multiple object types':Empty_DSwrapper, 
+    'Single object':Empty_DSwrapper,
+    'Negation':Empty_DSwrapper}
 
 
 st.title('Automated Assessment')
