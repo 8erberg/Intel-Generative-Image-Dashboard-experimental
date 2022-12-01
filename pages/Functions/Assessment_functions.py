@@ -190,9 +190,7 @@ def DETR_multi_object_counting(img, object_classes, object_counts, confidence_tr
 '''
 '''
 def DETR_multi_object_counting_DSwrapper(img, representations, Task_specific_label):
-    '''
-    #Dashboard wrapper of DETR_multi_object_counting
-    '''
+
     list_of_objects = representations.split(', ')
     object_counts = Task_specific_label.split(', ')
     return DETR_multi_object_counting(img,list_of_objects, object_counts, confidence_treshold=0.5)
