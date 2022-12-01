@@ -1,0 +1,62 @@
+ID,Task,Prompt,Representations,Task_specific_label,Auto_assessment,Linked_prompts
+1,Directed Actions,Girl pointing at a dog,"girl, dog",pointing at,FALSE,"29,30"
+2,Directed Actions,Monkey hitting a can,"monkey, can",hitting,FALSE,"31,32"
+3,Directed Actions,Man petting a cat,"man, cat",petting,FALSE,"33,34"
+4,Negation,A vase with no flowers in it,vase,flower,TRUE,35
+5,Negation,A street without a car,street,car,TRUE,36
+6,Negation,Man without a beard,man,beard,FALSE,33
+7,Spatial relationships,A book on top of a chair,"book, chair",on top,FALSE,"37,38"
+8,Spatial relationships,Car behind a bus,"car, bus",behind,FALSE,"39,61"
+9,Spatial relationships,Cup in front of a vase,"cup, vase",in front,FALSE,"40,35"
+10,Numbers (multiple objects),Five apples,apple,5,TRUE,41
+11,Numbers (multiple objects),Eight cars,car,8,TRUE,39
+12,Numbers (multiple objects),Three cups,cup ,3,TRUE,40
+13,Basic Arithmetic,Two apples and twice as many oranges,"apple, orange","2,4",TRUE,"41,42"
+14,Basic Arithmetic,One cat and three times as a many dogs,"cat, dog","1,3",TRUE,"34,30"
+15,Basic Arithmetic,Five spoons and two less knifes,"spoon, knife","5,3",TRUE,"43,44"
+16,Multiple object types,"A cow, an apple and a cat","cow, apple, cat",NA,TRUE,"45,41,34"
+17,Multiple object types,"A cup, a knife, a plate and a hat","cup, knife, plate, hat",NA,TRUE,"40,44,46,47"
+18,Multiple object types,"A balloon, a lion, a cow, a monkey and a surfboard","balloon, lion, cow, monkey, surfboard",NA,TRUE,"48,49,45,51"
+19,Chimeras,A cow with the tail of a snake,"cow, snake",NA,FALSE,"45,52"
+20,Chimeras,A fish with the wings of a duck,"fish, duck",NA,FALSE,"53,54"
+21,Chimeras,A lion with the head of a goat,"lion, goat",NA,FALSE,"49,55"
+22, Conditional generation,A green dinosaur or a red cup. Only render green things.,dinosaur,cup,TRUE,56
+23, Conditional generation,A snail or a horse. Only render mammals.,horse,snail,TRUE,57
+24, Conditional generation,A girl with a dog or a boy with a cat. Only show females.,"girl, dog","boy, cat",FALSE,"25,29,30"
+25,Multiple object types,A girl with a dog,"girl, dog",NA,TRUE,"29,30"
+26,Text rendering,"A book titled ""Probabilistic Models""",book ,Probabilistic Models,TRUE,37
+27,Text rendering,"A bar sign with the name ""Wish you were beer""",bar sign,Wish you were beer,TRUE,59
+28,Text rendering,"A shirt that says ""Sorry I am late. I did not want to come.""",shirt,Sorry I am late. I did not want to come.,TRUE,60
+29,Single object,A girl,girl,NA,TRUE,
+30,Single object,A dog,dog,NA,TRUE,
+31,Single object,A monkey,monkey,NA,TRUE,
+32,Single object,A can,can,NA,TRUE,
+33,Single object,A man,man,NA,TRUE,
+34,Single object,A cat,cat,NA,TRUE,
+35,Single object,A vase,vase,NA,TRUE,
+36,Single object,A street,street,NA,TRUE,
+37,Single object,A book,book,NA,TRUE,
+38,Single object,A chair,chair,NA,TRUE,
+39,Single object,A car,car,NA,TRUE,
+40,Single object,A cup,cup,NA,TRUE,
+41,Single object,An apple,apple,NA,TRUE,
+42,Single object,An orange,orange,NA,TRUE,
+43,Single object,A spoon,spoon,NA,TRUE,
+44,Single object,A knife,knife,NA,TRUE,
+45,Single object,A cow,cow,NA,TRUE,
+46,Single object,A plate,plate,NA,TRUE,
+47,Single object,A hat,hat,NA,TRUE,
+48,Single object,A balloon,balloon,NA,TRUE,
+49,Single object,A lion,lion,NA,TRUE,
+50,Single object,A monkey,monkey,NA,TRUE,
+51,Single object,A surfboard,surfboard,NA,TRUE,
+52,Single object,A snake,snake,NA,TRUE,
+53,Single object,A fish,fish,NA,TRUE,
+54,Single object,A duck,duck,NA,TRUE,
+55,Single object,A goat,goat,NA,TRUE,
+56,Single object,A dinosaur,dinosaur,NA,TRUE,
+57,Single object,A horse,horse,NA,TRUE,
+58,Single object,A girl,girl,NA,TRUE,
+59,Single object,A bar sign,bar sign,NA,TRUE,
+60,Single object,A shirt,shirt,NA,TRUE,
+61,Single object,A bus,bus,NA,TRUE,
