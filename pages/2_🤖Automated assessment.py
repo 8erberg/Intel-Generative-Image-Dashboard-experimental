@@ -2,8 +2,16 @@ import streamlit as st
 import numpy as np
 from itertools import compress
 from PIL import Image
-from pages.Functions.Assessment_functions import Empty_DSwrapper
+#from pages.Functions.Assessment_functions import Empty_DSwrapper
 
+@st.cache
+def Empty_DSwrapper(img, representations = None, Task_specific_label = None):
+    '''
+    Dashboard wrapper of DETR_multi_object_counting
+    '''
+    img_input = img
+
+    return True
 
 # Create dictionary to hold functions
 fun_dict = {
