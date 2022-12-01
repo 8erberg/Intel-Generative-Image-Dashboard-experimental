@@ -6,8 +6,8 @@ from transformers import CLIPProcessor, CLIPModel, DetrFeatureExtractor, DetrFor
 from PIL import Image
 CLIPmodel_import = CLIPModel.from_pretrained("openai/clip-vit-large-patch14")
 CLIPprocessor_import = CLIPProcessor.from_pretrained("openai/clip-vit-large-patch14")
-DetrFeatureExtractor_import = DetrFeatureExtractor.from_pretrained("facebook/detr-resnet-50")
-DetrModel_import = DetrForObjectDetection.from_pretrained("facebook/detr-resnet-50")
+#DetrFeatureExtractor_import = DetrFeatureExtractor.from_pretrained("facebook/detr-resnet-50")
+#DetrModel_import = DetrForObjectDetection.from_pretrained("facebook/detr-resnet-50")
 
 # Import list of coco example objects 
 script_path = os.path.dirname(__file__)
@@ -158,7 +158,7 @@ test_image = Image.open('pages/Functions/test_imageIII.jpeg')
 object_classes = ['cat','remote']
 object_counts = [2,2]
 '''
-
+'''
 def DETR_multi_object_counting(img, object_classes, object_counts, confidence_treshold=0.5):
   # Apply Detr to image
   inputs = DetrFeatureExtractor_import(images=img, return_tensors="pt")
@@ -187,11 +187,13 @@ def DETR_multi_object_counting(img, object_classes, object_counts, confidence_tr
         return False
   # If all match, return true
   return True
-
+'''
+'''
 def DETR_multi_object_counting_DSwrapper(img, representations, Task_specific_label):
     '''
-    Dashboard wrapper of DETR_multi_object_counting
+    #Dashboard wrapper of DETR_multi_object_counting
     '''
     list_of_objects = representations.split(', ')
     object_counts = Task_specific_label.split(', ')
     return DETR_multi_object_counting(img,list_of_objects, object_counts, confidence_treshold=0.5)
+'''
