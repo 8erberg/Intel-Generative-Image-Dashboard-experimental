@@ -56,7 +56,7 @@ st.header('Manual assessment')
 try:
   if sum(st.session_state['eval_df']['manual_eval_completed'])>0:
     # Display file uploader
-    manual_file_upload = st.file_uploader("Upload .csv with saved manual assessment")
+    manual_file_upload = st.file_uploader("Upload .csv with saved manual assessment for model comparison")
     
     # Create dataset for manual summary plots
     manual_eval_df = st.session_state['eval_df']
@@ -95,7 +95,7 @@ try:
   assessment_result_frames['Automated assessment'] = auto_eval_df
 
   # Display file uploader
-  auto_file_upload = st.file_uploader("Upload .csv with saved automated assessment")  
+  auto_file_upload = st.file_uploader("Upload .csv with saved automated assessment for model comparison")  
 
 
   # If df was uploaded for comparison, we create comparison plot, else simple plot
