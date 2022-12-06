@@ -1,10 +1,15 @@
 import streamlit as st
 import pandas as pd 
-import numpy as np
-from PIL import Image
-import os
-path = os.path.dirname(__file__)
-#st.write(path)
+import numpy as np 
+
+@st.cache
+def prompt_to_csv(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    df_download = df
+    df_download['Filename']='p'+df_download['ID'].astype('str')+'_1.png'
+    df_download = df[['Prompt','Filename']]
+    return df_download.to_csv().encode('utf-8')
+
 
 # Setup
 ## Load prompt directory
@@ -19,10 +24,42 @@ manual_prompts = prompt_dir.ID.tolist()
 
 # Page
 st.title('Generative Image Benchmark')
-st.write('This is an evaluation platform to assess the performance of image generation algorithms developed by Intel Labs. This is the alpha version of the platform and still in development. Refer to the following link for a user guide: https://github.com/8erberg/Intel-Generative-Image-Dashboard/blob/main/README.md')
+st.write('This is an evaluation platform to assess the performance of image generation algorithms developed by Intel Labs. This is the alpha version of the platform.')
+st.subheader('User guide')
+st.write('To assess a generative image algorithm, download a set of prompts using the prompt downloader below. Generate one image per prompt and use the file names provided to name your images. Upload these generated images in the data upload section below. The pages for manual assessment and automated assessment allow you to systematically assess the generated images. The results will be presented and ready for download on the assessment summary page.')
+st.sidebar.image('Graphics/IL_Logo.png')
 
-side_image = Image.open('Graphics/IL_Logo.png')
-st.sidebar.image(side_image)
+# Add prompt downloading functions
+prompt_download_dict = {}
+## Count how many prompts are in database to allow for max value in selection
+prompt_task_count = prompt_dir.Task.value_counts(sort=False)
+prompt_task_select = prompt_task_count.copy()
+## Hide downloader in box
+with st.expander("Prompt downloader"):
+    st.write('Select the number of prompts you want to download for each task category.')
+    # Create numerical selector for every task in prompt directory
+    for i_task in prompt_task_select.index:
+        prompt_task_select[i_task] = st.number_input(
+            i_task,
+            value = prompt_task_count[i_task], 
+            max_value=prompt_task_count[i_task],
+            min_value=0,
+            step = 1)
+
+    # Create df with selected number of prompts per task
+    for i_task in prompt_task_select.index:
+        temp_df = prompt_dir.loc[prompt_dir['Task']==i_task][0:prompt_task_select[i_task]]
+        if len(temp_df)>0:
+            prompt_download_dict[i_task]=temp_df
+
+    # Add download button for prompts
+    st.download_button(
+        label="Download prompts",
+        data=prompt_to_csv(pd.concat(prompt_download_dict.values())),
+        file_name='prompt_list.csv',
+        mime='text/csv',
+    )
+
 
 
 # Generate empty dataset for results, if it does not exist yet
@@ -49,7 +86,7 @@ with st.form("my-form", clear_on_submit=True):
             'Select share of uploaded images to be used for manual assessment.',
             ('100%', '50%'))
 
-        submitted = st.form_submit_button("Upload images")
+        submitted = st.form_submit_button("Add images")
         st.session_state['uploaded_img'] = st.session_state['uploaded_img']+uploaded_files
 
 
