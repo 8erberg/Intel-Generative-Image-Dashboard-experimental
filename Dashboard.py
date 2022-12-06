@@ -7,7 +7,7 @@ def prompt_to_csv(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     df_download = df
     df_download['Filename']='p'+df_download['ID'].astype('str')+'_1.png'
-    df_download = df[['Prompt','Filename']]
+    df_download = df[['Prompt','Filename']].drop_duplicates(subset='Filename')
     return df_download.to_csv().encode('utf-8')
 
 
@@ -29,14 +29,16 @@ st.subheader('User guide')
 st.write('To assess a generative image algorithm, download a set of prompts using the prompt downloader below. Generate one image per prompt and use the file names provided to name your images. Upload these generated images in the data upload section below. The pages for manual assessment and automated assessment allow you to systematically assess the generated images. The results will be presented and ready for download on the assessment summary page.')
 st.sidebar.image('Graphics/IL_Logo.png')
 
+
 # Add prompt downloading functions
 prompt_download_dict = {}
 ## Count how many prompts are in database to allow for max value in selection
 prompt_task_count = prompt_dir.Task.value_counts(sort=False)
+prompt_task_count = prompt_task_count.drop(index='Single object')
 prompt_task_select = prompt_task_count.copy()
 ## Hide downloader in box
 with st.expander("Prompt downloader"):
-    st.write('Select the number of prompts you want to download for each task category.')
+    st.write('Select the number of prompts you want to download for each task category. The set of prompts will automatically also include all single objects appearing in the selected prompts.')
     # Create numerical selector for every task in prompt directory
     for i_task in prompt_task_select.index:
         prompt_task_select[i_task] = st.number_input(
@@ -52,10 +54,20 @@ with st.expander("Prompt downloader"):
         if len(temp_df)>0:
             prompt_download_dict[i_task]=temp_df
 
+    # Concat all tasks to dataframe
+    prompt_download = pd.concat(prompt_download_dict.values())
+
+    # Add relevant single object prompts
+    single_object_ids = prompt_download.Linked_prompts.str.split(',').explode().unique().astype('int')
+    prompt_download = pd.concat([
+       prompt_download,
+       prompt_dir.loc[prompt_dir['ID'].isin(single_object_ids)] 
+    ])
+
     # Add download button for prompts
     st.download_button(
         label="Download prompts",
-        data=prompt_to_csv(pd.concat(prompt_download_dict.values())),
+        data=prompt_to_csv(prompt_download),
         file_name='prompt_list.csv',
         mime='text/csv',
     )
