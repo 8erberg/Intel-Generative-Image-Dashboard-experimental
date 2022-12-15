@@ -13,7 +13,7 @@ def prompt_to_csv(df):
 
 # Setup
 ## Load prompt directory
-prompt_dir = pd.read_csv('Data/Prompt_dir_221128.csv') #second version of prompt_dir
+prompt_dir = pd.read_csv('Data/Prompt_dir_221215.csv') #second version of prompt_dir
 st.session_state['prompt_dir'] = prompt_dir
 ## Create lists of prompts for manual and automated assessments
 st.session_state['automated_tasks'] = ['Multiple object types', 'Single object','Negation']

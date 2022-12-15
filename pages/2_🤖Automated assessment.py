@@ -2,29 +2,20 @@ import streamlit as st
 import numpy as np
 from itertools import compress
 from PIL import Image
-#from pages.Functions.Assessment_functions import Empty_DSwrapper
+from pages.Functions.Assessment_functions import CLIP_single_object_classifier, CLIP_multi_object_recognition_DSwrapper, CLIP_object_negation
 
-@st.cache
-def Empty_DSwrapper(img, representations = None, Task_specific_label = None):
-    '''
-    Dashboard wrapper of DETR_multi_object_counting
-    '''
-    img_input = img
-
-    return True
 
 # Create dictionary to hold functions
 fun_dict = {
-    'Multiple object types':Empty_DSwrapper, 
-    'Single object':Empty_DSwrapper,
-    'Negation':Empty_DSwrapper}
+    'Multiple object types':CLIP_multi_object_recognition_DSwrapper, 
+    'Single object':CLIP_single_object_classifier,
+    'Negation':CLIP_object_negation}
 
 
 st.title('Automated Assessment')
 st.write('On this page you can use automated assessment algorithms to assess how good uploaded images match their respective prompts.')
 st.write(' ')
-side_image = Image.open('Graphics/IL_Logo.png')
-st.sidebar.image(side_image)
+st.sidebar.image('Graphics/IL_Logo.png')
 
 try:
     # Create necessary variables

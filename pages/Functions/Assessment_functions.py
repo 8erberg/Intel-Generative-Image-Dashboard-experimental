@@ -19,17 +19,6 @@ coco_objects = coco_objects.split("\n")
 #test_image = Image.open('pages/Functions/test_image.png')
 #test_image = Image.open('pages/Functions/test_imageIV.png')
 
-###### Empty function for debugging
-
-def Empty_DSwrapper(img, representations = None, Task_specific_label = None):
-    '''
-    Dashboard wrapper of DETR_multi_object_counting
-    '''
-    img_input = img
-
-    return True
-
-
 ###### Helper functions
 def Coco_object_set(included_object, set_length=6):
     '''
