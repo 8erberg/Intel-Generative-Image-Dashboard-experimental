@@ -179,6 +179,10 @@ def DETR_multi_object_counting(img, object_classes, object_counts, confidence_tr
 
   # Return False is the count for a given label does not match
   for i_item in label_dict.items():
+    # Check whether current label item exists in count dict, else return false
+    if i_item[0] not in count_dict:
+        return False 
+    # Now that we checked the label item is in count dict, check that the count matches 
     if int(count_dict[i_item[0]])==int(i_item[1]): # Adding type control for comparison due to str read in
         print(str(i_item)+'_true')
     else:

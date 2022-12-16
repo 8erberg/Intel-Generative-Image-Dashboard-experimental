@@ -2,14 +2,16 @@ import streamlit as st
 import numpy as np
 from itertools import compress
 from PIL import Image
-from pages.Functions.Assessment_functions import CLIP_single_object_classifier, CLIP_multi_object_recognition_DSwrapper, CLIP_object_negation
+from pages.Functions.Assessment_functions import CLIP_single_object_classifier, CLIP_multi_object_recognition_DSwrapper, CLIP_object_negation, DETR_multi_object_counting_DSwrapper
 
 
 # Create dictionary to hold functions
 fun_dict = {
     'Multiple object types':CLIP_multi_object_recognition_DSwrapper, 
     'Single object':CLIP_single_object_classifier,
-    'Negation':CLIP_object_negation}
+    'Negation':CLIP_object_negation,
+    'Numbers (multiple objects)':DETR_multi_object_counting_DSwrapper,
+    'Simple arithmetic':DETR_multi_object_counting_DSwrapper}
 
 
 st.title('Automated Assessment')
@@ -62,14 +64,28 @@ if automated_eval_available > 0:
                     (curr_eval_df['automated_eval']==True)&
                     (curr_eval_df['Task']=='Negation')])
             ))
+
+        numbers = st.checkbox(
+            'Numbers / Counting ({0} images available)'.format(
+                len(curr_eval_df.loc[
+                    (curr_eval_df['automated_eval']==True)&
+                    (curr_eval_df['Task']=='Numbers (multiple objects)')])
+            ))
+
+        arithmetic = st.checkbox(
+            'Simple arithmetic ({0} images available)'.format(
+                len(curr_eval_df.loc[
+                    (curr_eval_df['automated_eval']==True)&
+                    (curr_eval_df['Task']=='Simple arithmetic')])
+            ))
         
         submitted = st.form_submit_button("Start automated assessment")
         if submitted:
             # Create list for tasks which were selected for assessment
             selected_tasks = list(
                 compress(
-                    ['Multiple object types','Single object','Negation'], 
-                    [assess_multi_object,assess_single_object,negation]))
+                    ['Multiple object types','Single object','Negation','Numbers (multiple objects)','Simple arithmetic'], 
+                    [assess_multi_object,assess_single_object,negation,numbers,arithmetic]))
             # Create dataset to loop over with assessment
             assessed_df = curr_eval_df.loc[
                     (curr_eval_df['automated_eval']==True)&
