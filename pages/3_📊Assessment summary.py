@@ -11,10 +11,13 @@ def convert_df_to_csv(df):
   # IMPORTANT: Cache the conversion to prevent computation on every rerun
   return df[['File_name','Prompt_no','Task','Score']].to_csv().encode('utf-8')
 
-def plot_style_simple(results_df):
+def plot_style_simple(results_df, return_table = False):
   eval_sum = results_df.groupby('Task')['Score'].sum()
   eval_count = results_df.groupby('Task')['Score'].count()
   eval_share = (eval_sum/eval_count)*100
+
+  if return_table:
+    return results_df.groupby('Task')['Score'].sum()/results_df.groupby('Task')['Score'].count()
 
   fig = plt.figure(figsize=(12, 3))
   sns.barplot(x=eval_share.index, y=eval_share.values, palette='GnBu')
@@ -23,9 +26,9 @@ def plot_style_simple(results_df):
   plt.xlabel(' ')
   return fig
 
-def plot_style_combined(results_df, uploaded_df = None):
+def plot_style_combined(results_df, uploaded_df = None, return_table=False):
   # Create joined dataframe of results and uploadd_df
-  uploaded_results_df = pd.read_csv(uploaded_df)
+  uploaded_results_df = uploaded_df
   manual_results_df['Model']='Current'
   uploaded_results_df['Model']='Uploaded'
   results_df = pd.concat([manual_results_df,uploaded_results_df])
@@ -35,6 +38,9 @@ def plot_style_combined(results_df, uploaded_df = None):
   eval_count = results_df.groupby(['Model','Task'])['Score'].count()
   eval_share = (eval_sum/eval_count)*100
   eval_share = eval_share.reset_index()
+
+  if return_table:
+    return results_df.groupby(['Task','Model'])['Score'].sum()/results_df.groupby(['Task','Model'])['Score'].count()
 
   # Create plot
   fig = plt.figure(figsize=(12, 3))
@@ -57,7 +63,9 @@ try:
   if sum(st.session_state['eval_df']['manual_eval_completed'])>0:
     # Display file uploader
     manual_file_upload = st.file_uploader("Upload .csv with saved manual assessment for model comparison")
-    
+    if manual_file_upload != None:
+      manual_file_upload_df = pd.read_csv(manual_file_upload)
+
     # Create dataset for manual summary plots
     manual_eval_df = st.session_state['eval_df']
     manual_eval_df['Score'] = manual_eval_df['manual_eval_task_score'].map({'Yes':True, 'No':False})
@@ -67,13 +75,25 @@ try:
 
     assessment_result_frames['Manual assessment'] = manual_results_df
 
-    # If df was uploaded for comparison, we create comparison plot, else simple plot
-    if manual_file_upload == None:
-      fig = plot_style_simple(manual_results_df)
-      st.pyplot(fig)
-    else:
-      fig = plot_style_combined(manual_results_df,manual_file_upload)
-      st.pyplot(fig)
+    # Create a tab for bar chart and one for table data
+    tab1, tab2 = st.tabs(["Bar chart", "Data table"])
+    with tab1:
+      # If df was uploaded for comparison, we create comparison plot, else simple plot
+      if manual_file_upload == None:
+        fig = plot_style_simple(manual_results_df)
+        st.pyplot(fig)
+      else:
+        fig = plot_style_combined(manual_results_df,manual_file_upload_df)
+        st.pyplot(fig)
+
+    with tab2:
+      # If df was uploaded for comparison, we create comparison table, else simple table
+      if manual_file_upload == None:
+        table = plot_style_simple(manual_results_df, return_table=True)
+        st.write(table)
+      else:
+        table = plot_style_combined(manual_results_df,manual_file_upload_df, return_table=True)
+        st.write(table)
 
     st.download_button(
       label="Download manual assessment data",
