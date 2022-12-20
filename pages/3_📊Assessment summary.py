@@ -50,6 +50,28 @@ def plot_style_combined(results_df, uploaded_df = None, return_table=False):
   plt.xlabel(' ')
   return fig
 
+def print_results_tabs(file_upload, results_df, file_upload_df=None):
+  # Create a tab for bar chart and one for table data
+  tab1, tab2 = st.tabs(["Bar chart", "Data table"])
+  with tab1:
+    # If df was uploaded for comparison, we create comparison plot, else simple plot
+    if file_upload == None:
+      fig = plot_style_simple(results_df)
+      st.pyplot(fig)
+    else:
+      fig = plot_style_combined(results_df,file_upload_df)
+      st.pyplot(fig)
+
+  with tab2:
+    # If df was uploaded for comparison, we create comparison table, else simple table
+    if file_upload == None:
+      table = plot_style_simple(results_df, return_table=True)
+      st.write(table)
+    else:
+      table = plot_style_combined(results_df,file_upload_df, return_table=True)
+      st.write(table)
+
+
 assessment_result_frames = {}
 
 
@@ -63,8 +85,6 @@ try:
   if sum(st.session_state['eval_df']['manual_eval_completed'])>0:
     # Display file uploader
     manual_file_upload = st.file_uploader("Upload .csv with saved manual assessment for model comparison")
-    if manual_file_upload != None:
-      manual_file_upload_df = pd.read_csv(manual_file_upload)
 
     # Create dataset for manual summary plots
     manual_eval_df = st.session_state['eval_df']
@@ -75,25 +95,12 @@ try:
 
     assessment_result_frames['Manual assessment'] = manual_results_df
 
-    # Create a tab for bar chart and one for table data
-    tab1, tab2 = st.tabs(["Bar chart", "Data table"])
-    with tab1:
-      # If df was uploaded for comparison, we create comparison plot, else simple plot
-      if manual_file_upload == None:
-        fig = plot_style_simple(manual_results_df)
-        st.pyplot(fig)
-      else:
-        fig = plot_style_combined(manual_results_df,manual_file_upload_df)
-        st.pyplot(fig)
-
-    with tab2:
-      # If df was uploaded for comparison, we create comparison table, else simple table
-      if manual_file_upload == None:
-        table = plot_style_simple(manual_results_df, return_table=True)
-        st.write(table)
-      else:
-        table = plot_style_combined(manual_results_df,manual_file_upload_df, return_table=True)
-        st.write(table)
+    # Add plots / tables to page
+    try:
+      manual_file_upload_df = pd.read_csv(manual_file_upload)
+      print_results_tabs(file_upload=manual_file_upload, results_df=manual_results_df, file_upload_df=manual_file_upload_df)
+    except ValueError:
+      print_results_tabs(file_upload=manual_file_upload, results_df=manual_results_df)
 
     st.download_button(
       label="Download manual assessment data",
@@ -116,6 +123,7 @@ try:
 
   # Display file uploader
   auto_file_upload = st.file_uploader("Upload .csv with saved automated assessment for model comparison")  
+
 
 
   # If df was uploaded for comparison, we create comparison plot, else simple plot
