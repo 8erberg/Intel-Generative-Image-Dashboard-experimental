@@ -50,6 +50,7 @@ def plot_style_combined(results_df, uploaded_df = None, return_table=False):
   plt.xlabel(' ')
   return fig
 
+
 def print_results_tabs(file_upload, results_df, file_upload_df=None):
   # Create a tab for bar chart and one for table data
   tab1, tab2 = st.tabs(["Bar chart", "Data table"])
@@ -77,9 +78,7 @@ assessment_result_frames = {}
 
 
 st.title('Assessment Summary')
-
 st.header('Manual assessment')
-
 
 try:
   if sum(st.session_state['eval_df']['manual_eval_completed'])>0:
@@ -97,7 +96,7 @@ try:
 
     # Add plots / tables to page
     try:
-      manual_file_upload_df = pd.read_csv(manual_file_upload)
+      manual_file_upload_df = pd.read_csv(manual_file_upload).copy()
       print_results_tabs(file_upload=manual_file_upload, results_df=manual_results_df, file_upload_df=manual_file_upload_df)
     except ValueError:
       print_results_tabs(file_upload=manual_file_upload, results_df=manual_results_df)
@@ -114,6 +113,8 @@ except KeyError:
   st.write('Complete automated assessment to generate summary.')
 
 
+
+
 st.write(' ')
 st.header('Automated assessment')
 try:
@@ -124,15 +125,12 @@ try:
   # Display file uploader
   auto_file_upload = st.file_uploader("Upload .csv with saved automated assessment for model comparison")  
 
-
-
-  # If df was uploaded for comparison, we create comparison plot, else simple plot
-  if auto_file_upload == None:
-    fig = plot_style_simple(auto_eval_df)
-    st.pyplot(fig)
-  else:
-    fig = plot_style_combined(auto_eval_df,auto_file_upload)
-    st.pyplot(fig)
+  # Add plots / tables to page
+  try:
+    auto_file_upload_df = pd.read_csv(auto_file_upload).copy()
+    print_results_tabs(file_upload=auto_file_upload, results_df=auto_eval_df, file_upload_df=auto_file_upload_df)
+  except ValueError:
+    print_results_tabs(file_upload=auto_file_upload, results_df=auto_eval_df)
 
   st.download_button(
     label="Download automated assessment data",
