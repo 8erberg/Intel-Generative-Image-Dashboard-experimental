@@ -184,7 +184,7 @@ else:
 
 
 #st.session_state['eval_df'].loc[curr_manual_eval,'manual_eval_completed']=True
-st.write(st.session_state['eval_df'])
+#st.write(st.session_state['eval_df'])
 
 
 
