@@ -8,6 +8,13 @@ from PIL import Image
 
 #TODO: add better comments to functions
 
+##### Dashboard main page
+def prompt_to_csv(df):
+    df_download = df
+    df_download['Filename']='p'+df_download['ID'].astype('str')+'_1.png'
+    df_download = df[['Prompt','Filename']].drop_duplicates(subset='Filename')
+    return df_download.to_csv().encode('utf-8')
+
 ##### Assessment summary
 def plot_style_simple(results_df, return_table = False):
   eval_sum = results_df.groupby('Task')['Score'].sum()
