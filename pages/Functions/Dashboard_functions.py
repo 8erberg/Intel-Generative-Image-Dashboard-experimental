@@ -15,6 +15,47 @@ def prompt_to_csv(df):
     df_download = df[['Prompt','Filename']].drop_duplicates(subset='Filename')
     return df_download.to_csv().encode('utf-8')
 
+##### Manual assessment
+
+def add_previous_manual_assessments():
+    '''
+    This is a routine to allow the user to upload prior manual ratings and override
+    current ratings. This way the user can restart a manual assessment.
+    '''
+    # Create dict to translate uploaded score into str format used during manual assessment
+    Bool_str_dict = {True:'Yes',False:'No'}
+
+    st.subheader('Add previous assessments')
+    st.write('Upload results of previous assessment (as downloaded from summary page) to add these results and skip these images in your current manual assessment. Note that you can only add results for images which you have uploaded using the same file name.')
+
+    uploaded_ratings = st.file_uploader('Select .csv for upload', accept_multiple_files=False)
+    if uploaded_ratings != None:
+        try:
+            uploaded_ratings_df = pd.read_csv(uploaded_ratings)
+            overlapping_files_df =pd.merge(st.session_state['eval_df'],uploaded_ratings_df,on='File_name',how='inner')
+            st.write('Number of matching file names found: '+ str(len(overlapping_files_df)))
+            st.write('Click "Add results" button to add / override current ratings with uploaded ratings.')
+        except UnicodeDecodeError:
+            st.write('WARNING: The uploaded file has to be a .csv downloaded from the "Assessment summary" page.')
+
+
+    submitted = st.button("Add results")
+    if submitted:
+        try:
+            for row in uploaded_ratings_df.itertuples():
+                st.session_state['eval_df'].loc[
+                    st.session_state['eval_df']['File_name']==row.File_name,'manual_eval']=True
+                st.session_state['eval_df'].loc[
+                    st.session_state['eval_df']['File_name']==row.File_name,'manual_eval_completed']=True
+                st.session_state['eval_df'].loc[
+                    st.session_state['eval_df']['File_name']==row.File_name,'manual_eval_task_score']=Bool_str_dict[row.Score]
+
+            # Reset page after ratings were submitted
+            st.experimental_rerun()
+        except NameError:
+            st.write('You need to upload a .csv file before you can add results.')
+
+
 ##### Assessment summary
 def plot_style_simple(results_df, return_table = False):
   eval_sum = results_df.groupby('Task')['Score'].sum()
