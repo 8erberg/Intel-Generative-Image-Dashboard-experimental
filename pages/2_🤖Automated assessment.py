@@ -40,52 +40,29 @@ except KeyError:
 # Else: Note to upload images for assessment
 if automated_eval_available > 0:
     
+    # Create objects to hold selections of tasks for automated assessment
+    task_list = list(fun_dict.keys())
+    task_list_len = len(task_list)
+    task_list_selected = task_list.copy()
+
     with st.form("auto_assessment_form",clear_on_submit=True):
         # Form info statment
         st.write('Select tasks to assess with the automated assessment:')
 
-        # Add selection for available categories
-        assess_multi_object = st.checkbox(
-            'Multiple object types ({0} images available)'.format(
-                len(curr_eval_df.loc[
-                    (curr_eval_df['automated_eval']==True)&
-                    (curr_eval_df['Task']=='Multiple object types')])
-            ))
-        assess_single_object = st.checkbox(
-            'Single object type ({0} images available)'.format(
-                len(curr_eval_df.loc[
-                    (curr_eval_df['automated_eval']==True)&
-                    (curr_eval_df['Task']=='Single object')])
-            ))
+        # Create list of bool selection buttons, one for every task
+        for i_task in range(task_list_len):
+            curr_task = task_list[i_task] 
+            curr_task_count = len(curr_eval_df.loc[
+                        (curr_eval_df['automated_eval']==True)&
+                        (curr_eval_df['Task']==curr_task)])
+            task_list_selected[i_task] = st.checkbox(      
+                '{0} ({1} images available)'.format(curr_task, str(curr_task_count)))
 
-        negation = st.checkbox(
-            'Negation ({0} images available)'.format(
-                len(curr_eval_df.loc[
-                    (curr_eval_df['automated_eval']==True)&
-                    (curr_eval_df['Task']=='Negation')])
-            ))
-
-        numbers = st.checkbox(
-            'Numbers / Counting ({0} images available)'.format(
-                len(curr_eval_df.loc[
-                    (curr_eval_df['automated_eval']==True)&
-                    (curr_eval_df['Task']=='Numbers (multiple objects)')])
-            ))
-
-        arithmetic = st.checkbox(
-            'Simple arithmetic ({0} images available)'.format(
-                len(curr_eval_df.loc[
-                    (curr_eval_df['automated_eval']==True)&
-                    (curr_eval_df['Task']=='Simple arithmetic')])
-            ))
-        
         submitted = st.form_submit_button("Start automated assessment")
-        if submitted:
+        if submitted:        
             # Create list for tasks which were selected for assessment
-            selected_tasks = list(
-                compress(
-                    ['Multiple object types','Single object','Negation','Numbers (multiple objects)','Simple arithmetic'], 
-                    [assess_multi_object,assess_single_object,negation,numbers,arithmetic]))
+            selected_tasks = list(compress(task_list,task_list_selected))
+
             # Create dataset to loop over with assessment
             assessed_df = curr_eval_df.loc[
                     (curr_eval_df['automated_eval']==True)&
