@@ -2,17 +2,7 @@ import streamlit as st
 import numpy as np
 from itertools import compress
 from PIL import Image
-from pages.Functions.Assessment_functions import CLIP_single_object_classifier, CLIP_multi_object_recognition_DSwrapper, CLIP_object_negation, DETR_multi_object_counting_DSwrapper
-
-
-# Create dictionary to hold functions
-fun_dict = {
-    'Multiple object types':CLIP_multi_object_recognition_DSwrapper, 
-    'Single object':CLIP_single_object_classifier,
-    'Negation':CLIP_object_negation,
-    'Numbers (multiple objects)':DETR_multi_object_counting_DSwrapper,
-    'Simple arithmetic':DETR_multi_object_counting_DSwrapper}
-
+from Dashboard_automation_setup import fun_dict
 
 st.title('Automated Assessment')
 st.write('On this page you can use automated assessment algorithms to assess how good uploaded images match their respective prompts.')
@@ -32,6 +22,9 @@ try:
     temp_prompt_dir=prompt_dir[['ID','Representations','Task_specific_label']]
     temp_prompt_dir['Prompt_no']=temp_prompt_dir['ID'].astype('str')
     curr_eval_df = curr_eval_df.merge(temp_prompt_dir,on='Prompt_no')
+
+    # Check that user correctly filled out the automation setup file
+    assert list(fun_dict.keys())==st.session_state['automated_tasks'], 'Unsure that the list of automated tasks in Dashboard_setup.py is the same as the keys of the function dict in Dashboard_automation_setup.py'
 except KeyError:
     automated_eval_available = 0
 
@@ -63,6 +56,7 @@ if automated_eval_available > 0:
             # Create list for tasks which were selected for assessment
             selected_tasks = list(compress(task_list,task_list_selected))
 
+
             # Create dataset to loop over with assessment
             assessed_df = curr_eval_df.loc[
                     (curr_eval_df['automated_eval']==True)&
@@ -81,5 +75,3 @@ if automated_eval_available > 0:
             st.write('Completed assessment. Access results on the summary page.')
 else:
     st.write('Upload files on dashboard starting page to start automated assessment.')
-
-#st.write(st.session_state['auto_eval_df'])

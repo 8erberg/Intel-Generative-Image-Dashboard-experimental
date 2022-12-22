@@ -96,9 +96,9 @@ def plot_style_combined(results_df, uploaded_df = None, return_table=False):
     eval_share = eval_share.reset_index()
 
     if return_table:
-    return_series = results_df.groupby(['Task','Model'])['Score'].sum()/results_df.groupby(['Task','Model'])['Score'].count()*100
-    return_series = return_series.rename('Percentage correct')
-    return return_series
+        return_series = results_df.groupby(['Task','Model'])['Score'].sum()/results_df.groupby(['Task','Model'])['Score'].count()*100
+        return_series = return_series.rename('Percentage correct')
+        return return_series
 
     # Add small amount to make the bars on plot not disappear
     eval_share['Score'] = eval_share['Score']+1
@@ -119,22 +119,22 @@ def print_results_tabs(file_upload, results_df, file_upload_df=None):
     # Create a tab for bar chart and one for table data
     tab1, tab2 = st.tabs(["Bar chart", "Data table"])
     with tab1:
-    # If df was uploaded for comparison, we create comparison plot, else simple plot
-    if file_upload == None:
-        fig = plot_style_simple(results_df)
-        st.pyplot(fig)
-    else:
-        fig = plot_style_combined(results_df,file_upload_df)
-        st.pyplot(fig)
+        # If df was uploaded for comparison, we create comparison plot, else simple plot
+        if file_upload == None:
+            fig = plot_style_simple(results_df)
+            st.pyplot(fig)
+        else:
+            fig = plot_style_combined(results_df,file_upload_df)
+            st.pyplot(fig)
 
     with tab2:
-    # If df was uploaded for comparison, we create comparison table, else simple table
-    if file_upload == None:
-        table = plot_style_simple(results_df, return_table=True)
-        st.write(table)
-    else:
-        table = plot_style_combined(results_df,file_upload_df, return_table=True)
-        st.write(table)
+        # If df was uploaded for comparison, we create comparison table, else simple table
+        if file_upload == None:
+            table = plot_style_simple(results_df, return_table=True)
+            st.write(table)
+        else:
+            table = plot_style_combined(results_df,file_upload_df, return_table=True)
+            st.write(table)
 
 
 def pre_assessment_visualisation(type_str):
@@ -146,5 +146,5 @@ def pre_assessment_visualisation(type_str):
     # Display file uploader
     file_upload = st.file_uploader("Upload .csv with saved {0} assessment to plot prior results.".format(type_str))
     if file_upload != None:
-    file_upload_df = pd.read_csv(file_upload).copy()
-    print_results_tabs(file_upload=None, results_df=file_upload_df)
+        file_upload_df = pd.read_csv(file_upload).copy()
+        print_results_tabs(file_upload=None, results_df=file_upload_df)

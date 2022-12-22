@@ -1,22 +1,14 @@
 import streamlit as st
 import pandas as pd 
 import numpy as np 
-
-@st.cache
-def prompt_to_csv(df):
-    # IMPORTANT: Cache the conversion to prevent computation on every rerun
-    df_download = df
-    df_download['Filename']='p'+df_download['ID'].astype('str')+'_1.png'
-    df_download = df[['Prompt','Filename']].drop_duplicates(subset='Filename')
-    return df_download.to_csv().encode('utf-8')
-
+from Dashboard_setup import prompt_dir, automated_task_list
+from pages.Functions.Dashboard_functions import prompt_to_csv
 
 # Setup
-## Load prompt directory
-prompt_dir = pd.read_csv('Data/Prompt_dir_221216.csv') #second version of prompt_dir
+## Add prompt directory to session state
 st.session_state['prompt_dir'] = prompt_dir
 ## Create lists of prompts for manual and automated assessments
-st.session_state['automated_tasks'] = ['Multiple object types', 'Single object','Negation','Numbers (multiple objects)','Simple arithmetic']
+st.session_state['automated_tasks'] = automated_task_list
 automated_prompts = prompt_dir.loc[
     (prompt_dir['Auto_assessment']==True)&
     (prompt_dir['Task']).isin(st.session_state['automated_tasks'])].ID.tolist()
@@ -28,7 +20,6 @@ st.write('This is an evaluation platform to assess the performance of image gene
 st.subheader('User guide')
 st.write('To assess a generative image algorithm, download a set of prompts using the prompt downloader below. Generate one image per prompt and use the file names provided to name your images. Upload these generated images in the data upload section below. The pages for manual assessment and automated assessment allow you to systematically assess the generated images. The results will be presented and ready for download on the assessment summary page.')
 st.sidebar.image('Graphics/IL_Logo.png')
-
 
 # Add prompt downloading functions
 prompt_download_dict = {}
@@ -73,7 +64,6 @@ with st.expander("Prompt downloader"):
     )
 
 
-
 # Generate empty dataset for results, if it does not exist yet
 try:
     num_uploaded_images = st.session_state['eval_df'].shape[0]
@@ -88,6 +78,7 @@ try:
 except KeyError:
     st.session_state['results_dict'] = {}
 
+
 # Data upload setup
 st.subheader('Data upload')
 #uploaded_files = st.file_uploader('Upload generated images', accept_multiple_files=True)
@@ -100,6 +91,7 @@ with st.form("my-form", clear_on_submit=True):
 
         submitted = st.form_submit_button("Add images")
         st.session_state['uploaded_img'] = st.session_state['uploaded_img']+uploaded_files
+
 
 
 # Add new uploaded images to session state
@@ -150,7 +142,3 @@ if eval_df.shape[0]!=0:
     st.write("- Available for automated assessment: ", str(sum(eval_df.automated_eval)))
 else:
     st.write("Upload files to start the assessment.")
-
-#st.write(eval_df)
-#st.write(prompt_dir)
-#st.session_state['eval_df']
