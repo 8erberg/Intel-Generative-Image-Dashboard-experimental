@@ -74,7 +74,7 @@ def plot_style_simple(results_df, return_table = False):
 
     fig = plt.figure(figsize=(12, 3))
     sns.barplot(x=eval_share.index, y=eval_share.values, palette='GnBu')
-    plt.xticks(rotation=-45)
+    plt.xticks(rotation=-65)
     plt.ylabel('Percentage correct')
     plt.xlabel(' ')
     return fig
@@ -106,7 +106,7 @@ def plot_style_combined(results_df, uploaded_df = None, return_table=False):
     # Create plot
     fig = plt.figure(figsize=(12, 3))
     sns.barplot(data=eval_share,x='Task',y='Score',hue='Model', palette='GnBu')
-    plt.xticks(rotation=-45)
+    plt.xticks(rotation=-65)
     plt.ylabel('Percentage correct')
     plt.xlabel(' ')
     return fig
