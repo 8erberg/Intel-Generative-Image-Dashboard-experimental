@@ -111,11 +111,11 @@ def plot_style_combined(results_df, uploaded_df = None, return_table=False):
     plt.xlabel(' ')
     return fig
 
-
+'''
 def print_results_tabs(file_upload, results_df, file_upload_df=None):
-    '''
-    Routine used to give user the choice between showing results as bar chart or table
-    '''
+
+#Routine used to give user the choice between showing results as bar chart or table
+
     # Create a tab for bar chart and one for table data
     tab1, tab2 = st.tabs(["Bar chart", "Data table"])
     with tab1:
@@ -135,6 +135,7 @@ def print_results_tabs(file_upload, results_df, file_upload_df=None):
         else:
             table = plot_style_combined(results_df,file_upload_df, return_table=True)
             st.write(table)
+'''
 
 
 def pre_assessment_visualisation(type_str):
@@ -144,7 +145,7 @@ def pre_assessment_visualisation(type_str):
     st.write('Complete {0} assessment or upload .csv with saved {0} assessment to generate summary.'.format(type_str))
 
     # Display file uploader
-    file_upload = st.file_uploader("Upload .csv with saved {0} assessment to plot prior results.".format(type_str))
+    file_upload = st.file_uploader("Upload .csv with saved {0} assessment to plot prior results.".format(type_str), accept_multiple_files=True)
     if file_upload != None:
         file_upload_df = pd.read_csv(file_upload).copy()
-        print_results_tabs(file_upload=None, results_df=file_upload_df)
+        print_results_tabs(file_upload=file_upload, results_df=None)
