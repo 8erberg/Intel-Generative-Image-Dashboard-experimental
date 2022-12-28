@@ -3,65 +3,9 @@ import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image
-from pages.Functions.Dashboard_functions import plot_style_simple, plot_style_combined, pre_assessment_visualisation
+from pages.Functions.Dashboard_functions import pre_assessment_visualisation, multi_comparison_plotI, print_results_tabs
 side_image = Image.open('Graphics/IL_Logo.png')
 st.sidebar.image(side_image)
-
-def pre_assessment_visualisation(type_str):
-    '''
-    Routine used to allow user to visualise uploaded results before completing any assessments
-    '''
-    st.write('Complete {0} assessment or upload .csv with saved {0} assessment to generate summary.'.format(type_str))
-
-    # Display file uploader
-    file_upload = st.file_uploader("Upload .csv with saved {0} assessment to plot prior results.".format(type_str), accept_multiple_files=True)
-    if len(file_upload) > 0:
-        print_results_tabs(file_upload=file_upload, results_df=None)
-
-def multi_comparison_plotI(results_df = None, uploaded_df_list = []):
-  # If list of uploaded_dfs is provided, we transform them into pd.Dfs and add the file name as model name
-  # Multiple file uploader returns empty list as default
-  file_upload_names = [x.name for x in uploaded_df_list]
-  plot_df_list = [pd.read_csv(x) for x in uploaded_df_list]
-  for i_df in range(len(file_upload_names)):
-    plot_df_list[i_df]= plot_df_list[i_df].assign(Model=file_upload_names[i_df])
-
-  # If results df is provided, add it to list of dfs to plot
-  if type(results_df) == pd.DataFrame:
-    plot_df_list.append(results_df)
-
-  # Concat all frames to joined dataframe
-  plot_df = pd.concat(plot_df_list)
-
-  # Calculate the grouped percentage scores per task category and model
-  grouped_series = plot_df.groupby(['Task','Model'])['Score'].sum()/plot_df.groupby(['Task','Model'])['Score'].count()*100
-  grouped_series = grouped_series.rename('Percentage correct')
-
-  # Create plot
-  eval_share = grouped_series.reset_index()
-  # Add small amount to make the bars on plot not disappear
-  eval_share['Percentage correct'] = eval_share['Percentage correct']+1
-
-  # Create plot
-  fig = plt.figure(figsize=(12, 3))
-  sns.barplot(data=eval_share,x='Task',y='Percentage correct',hue='Model', palette='GnBu')
-  plt.xticks(rotation=-65)
-  plt.xlabel(' ')
-  return fig,grouped_series
-
-
-def print_results_tabs(file_upload, results_df):
-    '''
-    #Routine used to give user the choice between showing results as bar chart or table
-    '''
-    # Create a tab for bar chart and one for table data
-    fig, table = multi_comparison_plotI(results_df=results_df, uploaded_df_list=file_upload)
-    tab1, tab2 = st.tabs(["Bar chart", "Data table"])
-    with tab1:
-      st.pyplot(fig)
-
-    with tab2:
-        st.write(table)
 
 
 @st.cache
@@ -91,10 +35,6 @@ try:
     assessment_result_frames['Manual assessment'] = manual_results_df
 
     # Add plots / tables to page
-    #try:
-    #  manual_file_upload_df = pd.read_csv(manual_file_upload).copy()
-    #  print_results_tabs(file_upload=manual_file_upload, results_df=manual_results_df, file_upload_df=manual_file_upload_df)
-    #except ValueError:
     print_results_tabs(file_upload=manual_file_upload, results_df=manual_results_df)
 
     st.download_button(
@@ -120,11 +60,6 @@ try:
   auto_file_upload = st.file_uploader("Upload .csv with saved automated assessment for model comparison", accept_multiple_files=True)  
 
   # Add plots / tables to page
-  #try:
-  #  auto_file_upload_df = pd.read_csv(auto_file_upload).copy()
-  #  print_results_tabs(file_upload=auto_file_upload, results_df=auto_eval_df, file_upload_df=auto_file_upload_df)
-  #except ValueError:
-  #  print_results_tabs(file_upload=auto_file_upload, results_df=auto_eval_df)
   print_results_tabs(file_upload=auto_file_upload, results_df=auto_eval_df)
 
   st.download_button(

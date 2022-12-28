@@ -56,6 +56,69 @@ def add_previous_manual_assessments():
 
 
 ##### Assessment summary
+
+def print_results_tabs(file_upload, results_df):
+    '''
+    #Routine used to give user the choice between showing results as bar chart or table
+    '''
+    # Create a tab for bar chart and one for table data
+    fig, table = multi_comparison_plotI(results_df=results_df, uploaded_df_list=file_upload)
+    tab1, tab2 = st.tabs(["Bar chart", "Data table"])
+    with tab1:
+      st.pyplot(fig)
+
+    with tab2:
+        st.write(table)
+
+
+def pre_assessment_visualisation(type_str):
+    '''
+    Routine used to allow user to visualise uploaded results before completing any assessments
+    '''
+    st.write('Complete {0} assessment or upload .csv with saved {0} assessment to generate summary.'.format(type_str))
+
+    # Display file uploader
+    file_upload = st.file_uploader("Upload .csv with saved {0} assessment to plot prior results.".format(type_str), accept_multiple_files=True)
+    if len(file_upload) > 0:
+        print_results_tabs(file_upload=file_upload, results_df=None)
+
+
+def multi_comparison_plotI(results_df = None, uploaded_df_list = []):
+  # If list of uploaded_dfs is provided, we transform them into pd.Dfs and add the file name as model name
+  # Multiple file uploader returns empty list as default
+  file_upload_names = [x.name for x in uploaded_df_list]
+  plot_df_list = [pd.read_csv(x) for x in uploaded_df_list]
+  for i_df in range(len(file_upload_names)):
+    plot_df_list[i_df]= plot_df_list[i_df].assign(Model=file_upload_names[i_df])
+
+  # If results df is provided, add it to list of dfs to plot
+  if type(results_df) == pd.DataFrame:
+    plot_df_list.append(results_df)
+
+  # Concat all frames to joined dataframe
+  plot_df = pd.concat(plot_df_list)
+
+  # Calculate the grouped percentage scores per task category and model
+  grouped_series = plot_df.groupby(['Task','Model'])['Score'].sum()/plot_df.groupby(['Task','Model'])['Score'].count()*100
+  grouped_series = grouped_series.rename('Percentage correct')
+
+  # Create plot
+  eval_share = grouped_series.reset_index()
+  # Add small amount to make the bars on plot not disappear
+  eval_share['Percentage correct'] = eval_share['Percentage correct']+1
+
+  # Create plot
+  fig = plt.figure(figsize=(12, 3))
+  sns.barplot(data=eval_share,x='Task',y='Percentage correct',hue='Model', palette='GnBu')
+  plt.xticks(rotation=-65)
+  plt.xlabel(' ')
+  return fig,grouped_series
+
+
+
+
+############## Functions no longer used, to be deleted
+
 def plot_style_simple(results_df, return_table = False):
     '''
     Simple plot function for plotting just one dataframe of results
@@ -110,42 +173,3 @@ def plot_style_combined(results_df, uploaded_df = None, return_table=False):
     plt.ylabel('Percentage correct')
     plt.xlabel(' ')
     return fig
-
-'''
-def print_results_tabs(file_upload, results_df, file_upload_df=None):
-
-#Routine used to give user the choice between showing results as bar chart or table
-
-    # Create a tab for bar chart and one for table data
-    tab1, tab2 = st.tabs(["Bar chart", "Data table"])
-    with tab1:
-        # If df was uploaded for comparison, we create comparison plot, else simple plot
-        if file_upload == None:
-            fig = plot_style_simple(results_df)
-            st.pyplot(fig)
-        else:
-            fig = plot_style_combined(results_df,file_upload_df)
-            st.pyplot(fig)
-
-    with tab2:
-        # If df was uploaded for comparison, we create comparison table, else simple table
-        if file_upload == None:
-            table = plot_style_simple(results_df, return_table=True)
-            st.write(table)
-        else:
-            table = plot_style_combined(results_df,file_upload_df, return_table=True)
-            st.write(table)
-'''
-
-
-def pre_assessment_visualisation(type_str):
-    '''
-    Routine used to allow user to visualise uploaded results before completing any assessments
-    '''
-    st.write('Complete {0} assessment or upload .csv with saved {0} assessment to generate summary.'.format(type_str))
-
-    # Display file uploader
-    file_upload = st.file_uploader("Upload .csv with saved {0} assessment to plot prior results.".format(type_str), accept_multiple_files=True)
-    if file_upload != None:
-        file_upload_df = pd.read_csv(file_upload).copy()
-        print_results_tabs(file_upload=file_upload, results_df=None)
