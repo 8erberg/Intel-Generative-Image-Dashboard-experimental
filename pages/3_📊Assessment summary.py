@@ -7,6 +7,16 @@ from pages.Functions.Dashboard_functions import plot_style_simple, plot_style_co
 side_image = Image.open('Graphics/IL_Logo.png')
 st.sidebar.image(side_image)
 
+def pre_assessment_visualisation(type_str):
+    '''
+    Routine used to allow user to visualise uploaded results before completing any assessments
+    '''
+    st.write('Complete {0} assessment or upload .csv with saved {0} assessment to generate summary.'.format(type_str))
+
+    # Display file uploader
+    file_upload = st.file_uploader("Upload .csv with saved {0} assessment to plot prior results.".format(type_str), accept_multiple_files=True)
+    if len(file_upload) > 0:
+        print_results_tabs(file_upload=file_upload, results_df=None)
 
 def multi_comparison_plotI(results_df = None, uploaded_df_list = []):
   # If list of uploaded_dfs is provided, we transform them into pd.Dfs and add the file name as model name
@@ -40,12 +50,12 @@ def multi_comparison_plotI(results_df = None, uploaded_df_list = []):
   return fig,grouped_series
 
 
-def print_results_tabs(file_upload, results_df, file_upload_df=None):
+def print_results_tabs(file_upload, results_df):
     '''
     #Routine used to give user the choice between showing results as bar chart or table
     '''
     # Create a tab for bar chart and one for table data
-    fig, table = multi_comparison_plotI(results_df=manual_results_df, uploaded_df_list=file_upload)
+    fig, table = multi_comparison_plotI(results_df=results_df, uploaded_df_list=file_upload)
     tab1, tab2 = st.tabs(["Bar chart", "Data table"])
     with tab1:
       st.pyplot(fig)
@@ -98,8 +108,6 @@ try:
 except KeyError:
   pre_assessment_visualisation(type_str='manual')
 
-st.write(manual_results_df)
-
 st.write(' ')
 st.header('Automated assessment')
 try:
@@ -109,14 +117,15 @@ try:
   assessment_result_frames['Automated assessment'] = auto_eval_df
 
   # Display file uploader
-  auto_file_upload = st.file_uploader("Upload .csv with saved automated assessment for model comparison")  
+  auto_file_upload = st.file_uploader("Upload .csv with saved automated assessment for model comparison", accept_multiple_files=True)  
 
   # Add plots / tables to page
-  try:
-    auto_file_upload_df = pd.read_csv(auto_file_upload).copy()
-    print_results_tabs(file_upload=auto_file_upload, results_df=auto_eval_df, file_upload_df=auto_file_upload_df)
-  except ValueError:
-    print_results_tabs(file_upload=auto_file_upload, results_df=auto_eval_df)
+  #try:
+  #  auto_file_upload_df = pd.read_csv(auto_file_upload).copy()
+  #  print_results_tabs(file_upload=auto_file_upload, results_df=auto_eval_df, file_upload_df=auto_file_upload_df)
+  #except ValueError:
+  #  print_results_tabs(file_upload=auto_file_upload, results_df=auto_eval_df)
+  print_results_tabs(file_upload=auto_file_upload, results_df=auto_eval_df)
 
   st.download_button(
     label="Download automated assessment data",
@@ -171,110 +180,3 @@ except IndexError:
 except KeyError:
   pass
 
-
-
-file_upload = st.file_uploader("Upload .csv with sat to plot prior results.", accept_multiple_files=True)
-st.write(type(file_upload))
-st.write(len(file_upload))
-
-st.write(file_upload)
-
-'''
-results_df = manual_results_df
-if type(results_df) == pd.DataFrame:
-  plot_df_list.append(results_df)
-return_table = False
-
-plot_df = pd.concat(plot_df_list)
-st.write(plot_df)
-
-grouped_series = plot_df.groupby(['Task','Model'])['Score'].sum()/plot_df.groupby(['Task','Model'])['Score'].count()*100
-grouped_series = grouped_series.rename('Percentage correct')
-
-st.write(grouped_series)
-
-
-eval_share = grouped_series.reset_index()
-st.write(eval_share)
-# Add small amount to make the bars on plot not disappear
-eval_share['Percentage correct'] = eval_share['Percentage correct']+1
-
-# Create plot
-fig = plt.figure(figsize=(12, 3))
-sns.barplot(data=eval_share,x='Task',y='Percentage correct',hue='Model', palette='GnBu')
-plt.xticks(rotation=-65)
-plt.xlabel(' ')
-st.pyplot(fig)
-'''
-
-
-
-
-exfig = multi_comparison_plotI(results_df=manual_results_df, uploaded_df_list=file_upload, return_table=True)
-st.write(exfig)
-st.pyplot(exfig)
-
-
-if len(file_upload) > 0:
-    file_upload_df = pd.read_csv(file_upload).copy()
-    #print_results_tabs(file_upload=None, results_df=file_upload_df)
-
-file_upload_names = [x.name for x in file_upload]
-plot_df_list = [pd.read_csv(x) for x in file_upload]
-
-
-########### ref
-def plot_style_simple(results_df, return_table = False):
-    '''
-    Simple plot function for plotting just one dataframe of results
-    '''
-    eval_sum = results_df.groupby('Task')['Score'].sum()
-    eval_count = results_df.groupby('Task')['Score'].count()
-    eval_share = (eval_sum/eval_count)*100
-
-    if return_table:
-        return_series = results_df.groupby('Task')['Score'].sum()/results_df.groupby('Task')['Score'].count()*100
-        return_series = return_series.rename('Percentage correct')
-        return return_series
-
-    # Add small amount to make the bars on plot not disappear
-    eval_share = eval_share+1
-
-    fig = plt.figure(figsize=(12, 3))
-    sns.barplot(x=eval_share.index, y=eval_share.values, palette='GnBu')
-    plt.xticks(rotation=-65)
-    plt.ylabel('Percentage correct')
-    plt.xlabel(' ')
-    return fig
-
-def plot_style_combined(results_df, uploaded_df = None, return_table=False):
-    '''
-    Plot function which can plot to dataframe for comparison
-    '''
-    # Create joined dataframe of results and uploadd_df
-    uploaded_results_df = uploaded_df
-    manual_results_df['Model']='Current'
-    uploaded_results_df['Model']='Uploaded'
-    results_df = pd.concat([manual_results_df,uploaded_results_df])
-
-    # Create scores for plot
-    eval_sum = results_df.groupby(['Model','Task'])['Score'].sum()
-    eval_count = results_df.groupby(['Model','Task'])['Score'].count()
-    eval_share = (eval_sum/eval_count)*100
-    eval_share = eval_share.reset_index()
-
-    if return_table:
-        return_series = results_df.groupby(['Task','Model'])['Score'].sum()/results_df.groupby(['Task','Model'])['Score'].count()*100
-        return_series = return_series.rename('Percentage correct')
-        return return_series
-
-    # Add small amount to make the bars on plot not disappear
-    eval_share['Score'] = eval_share['Score']+1
-
-    # Create plot
-    fig = plt.figure(figsize=(12, 3))
-    sns.barplot(data=eval_share,x='Task',y='Score',hue='Model', palette='GnBu')
-    plt.xticks(rotation=-65)
-    plt.ylabel('Percentage correct')
-    plt.xlabel(' ')
-    return fig
