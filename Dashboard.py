@@ -49,7 +49,6 @@ with st.expander("Prompt downloader"):
     prompt_download = pd.concat(prompt_download_dict.values())
     # Exclude prompts from single object prompt download, as else the int transform gives an error
     single_object_prompt_download = prompt_download.dropna(subset='Linked_prompts')
-    st.write(single_object_prompt_download)
 
     # Add relevant single object prompts
     single_object_ids = single_object_prompt_download.Linked_prompts.str.split(',').explode().unique().astype('int')
@@ -57,6 +56,10 @@ with st.expander("Prompt downloader"):
        prompt_download,
        prompt_dir.loc[prompt_dir['ID'].isin(single_object_ids)] 
     ])
+
+    # For img2img prompt, the prompt in the download gets replaced by img2img instructions
+    img2img_instructions_col = prompt_download.loc[prompt_download['Task'].str.startswith('img2img')]['img2img_instructions']
+    prompt_download.loc[prompt_download['Task'].str.startswith('img2img'),'Prompt']=img2img_instructions_col
 
     # Add download button for prompts
     st.download_button(
