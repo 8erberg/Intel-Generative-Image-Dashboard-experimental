@@ -40,7 +40,7 @@ if automated_eval_available > 0:
 
     with st.form("auto_assessment_form",clear_on_submit=True):
         # Form info statment
-        st.write('Select tasks to assess with the automated assessment:')
+        st.write('Select tasks to assess with the automated assessment below. Once you started an assessment you will not be able to leave this page before the assessment is completed.')
 
         # Create list of bool selection buttons, one for every task
         for i_task in range(task_list_len):
