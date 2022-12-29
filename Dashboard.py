@@ -47,9 +47,12 @@ with st.expander("Prompt downloader"):
 
     # Concat all tasks to dataframe
     prompt_download = pd.concat(prompt_download_dict.values())
+    # Exclude prompts from single object prompt download, as else the int transform gives an error
+    single_object_prompt_download = prompt_download.dropna(subset='Linked_prompts')
+    st.write(single_object_prompt_download)
 
     # Add relevant single object prompts
-    single_object_ids = prompt_download.Linked_prompts.str.split(',').explode().unique().astype('int')
+    single_object_ids = single_object_prompt_download.Linked_prompts.str.split(',').explode().unique().astype('int')
     prompt_download = pd.concat([
        prompt_download,
        prompt_dir.loc[prompt_dir['ID'].isin(single_object_ids)] 
