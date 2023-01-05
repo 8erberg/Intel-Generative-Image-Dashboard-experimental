@@ -26,6 +26,14 @@ except KeyError:
     manual_eval_available = 0
     st.session_state['uploaded_img'] = [] #safety if program is started on manual assesssment page and not desktop
 
+# Create manual rating history if it does not already exist
+try:
+    _ = st.session_state['manual_rating_history'][-1]
+except KeyError:
+    st.session_state['manual_rating_history'] = []
+except IndexError:
+    pass
+
 
 # Main rating loop
 ## If images are available for rating this creates a from to submit ratings to database
@@ -121,6 +129,9 @@ if manual_eval_available > 0:
             st.session_state['eval_df'].loc[
                 curr_picture_index,'manual_eval_task_score']=curr_manual_eval_row['manual_eval_task_score'].item()       
 
+            # Add picture index to rating history
+            st.session_state['manual_rating_history'].append(curr_picture_index)
+
             # Add subprompt assessment if dataset was created for subprompts
             # This stage will automatically be skipped if the df for linked prompts is empty
             for row in curr_linked_rows.itertuples():
@@ -134,6 +145,16 @@ if manual_eval_available > 0:
             # Reset page after ratings were submitted
             st.experimental_rerun()
 
+    # Delete previous rating
+    if len(st.session_state['manual_rating_history'])>0:
+        if st.button('Return to last rated image'):
+            deleted_picture_index = st.session_state['manual_rating_history'].pop()
+            st.session_state['eval_df'].loc[
+                deleted_picture_index,'manual_eval_completed']=False
+            st.session_state['eval_df'].loc[
+                deleted_picture_index,'manual_eval_task_score']=np.nan  
+            st.experimental_rerun() 
+
     # Add option to add previous manual assessments
     add_previous_manual_assessments()
 
@@ -143,7 +164,5 @@ elif len(st.session_state['uploaded_img'])==0:
 # If files are uploaded but all ratings are completed
 else:
     assessment_progress.write('You finished assessing the current batch of uploaded images. Upload more pictures of generate your results on the summary page.')
-
-
 
 
