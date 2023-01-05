@@ -6,6 +6,32 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image
 
+##### Page-unspecific functions
+
+def assert_uploaded_frame(uploaded_df):
+    # Set up variables checked for
+    asserted_columns = {
+      'Prompt_no':pd.api.types.is_integer_dtype,
+      'Score':pd.api.types.is_bool_dtype,
+      'Task':pd.api.types.is_object_dtype,
+      'File_name':pd.api.types.is_object_dtype}
+    asserted_column_names = ['Prompt_no','Score','Task','File_name']
+
+    # Check whether all needed column names are present
+    existing_column_names = [(x in uploaded_df.columns) for x in asserted_column_names]
+    assert all(existing_column_names), "The uploaded dataframe is missing a column needed for import. Your table needs to contain the columns: 'Prompt_no', 'Score', 'Task', 'File_name' "
+
+    # Check whether all needed columns have correct dtypes
+    correct_column_dtypes = []
+    for i_item in asserted_columns.items():
+        dtype_test = i_item[1](uploaded_df[i_item[0]].dtype)
+        correct_column_dtypes.append(dtype_test)
+    assert all(correct_column_dtypes), "Incorrect dtypes in uploaded dataframe."
+
+def assert_multi_frame_upload(list_of_uploaded_dfs):
+    # Apply uploaded frame assert to list of frames
+    for i_df in list_of_uploaded_dfs:
+        assert_uploaded_frame(i_df)
 
 ##### Dashboard main page
 def prompt_to_csv(df):
@@ -31,6 +57,11 @@ def add_previous_manual_assessments():
     if uploaded_ratings != None:
         try:
             uploaded_ratings_df = pd.read_csv(uploaded_ratings)
+            
+            # Run standard assert pipeline
+            assert_uploaded_frame(uploaded_ratings_df)
+
+            # Show matching image count and instructions
             overlapping_files_df =pd.merge(st.session_state['eval_df'],uploaded_ratings_df,on='File_name',how='inner')
             st.write('Number of matching file names found: '+ str(len(overlapping_files_df)))
             st.write('Click "Add results" button to add / override current ratings with uploaded ratings.')
@@ -81,31 +112,6 @@ def pre_assessment_visualisation(type_str):
     file_upload = st.file_uploader("Upload .csv with saved {0} assessment to plot prior results.".format(type_str), accept_multiple_files=True)
     if len(file_upload) > 0:
         print_results_tabs(file_upload=file_upload, results_df=None)
-
-def assert_uploaded_frame(uploaded_df):
-    # Set up variables checked for
-    asserted_columns = {
-      'Prompt_no':pd.api.types.is_integer_dtype,
-      'Score':pd.api.types.is_bool_dtype,
-      'Task':pd.api.types.is_object_dtype,
-      'File_name':pd.api.types.is_object_dtype}
-    asserted_column_names = ['Prompt_no','Score','Task','File_name']
-
-    # Check whether all needed column names are present
-    existing_column_names = [(x in uploaded_df.columns) for x in asserted_column_names]
-    assert all(existing_column_names), "The uploaded dataframe is missing a column needed for import. Your table needs to contain the columns: 'Prompt_no', 'Score', 'Task', 'File_name' "
-
-    # Check whether all needed columns have correct dtypes
-    correct_column_dtypes = []
-    for i_item in asserted_columns.items():
-        dtype_test = i_item[1](uploaded_df[i_item[0]].dtype)
-        correct_column_dtypes.append(dtype_test)
-    assert all(correct_column_dtypes), "Incorrect dtypes in uploaded dataframe."
-
-def assert_multi_frame_upload(list_of_uploaded_dfs):
-    # Apply uploaded frame assert to list of frames
-    for i_df in list_of_uploaded_dfs:
-        assert_uploaded_frame(i_df)
 
 
 def multi_comparison_plotI(results_df = None, uploaded_df_list = []):
