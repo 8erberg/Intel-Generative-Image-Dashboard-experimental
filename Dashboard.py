@@ -146,5 +146,9 @@ if eval_df.shape[0]!=0:
     st.write("- Available for manual assessment: ", str(sum(eval_df.manual_eval)))
     manual_eval_available = sum(eval_df.manual_eval)
     st.write("- Available for automated assessment: ", str(sum(eval_df.automated_eval)))
+
+    if eval_df.shape[0]>sum(eval_df.manual_eval):
+        st.write('WARNING: {0} image(s) with invalid file names uploaded. Pictures with invalid names will not be available for assessment. Use the file names provided by the prompt downloader to correctly name your generated images.'.format(str(eval_df.shape[0]-sum(eval_df.manual_eval))))
+
 else:
     st.write("Upload files to start the assessment.")
