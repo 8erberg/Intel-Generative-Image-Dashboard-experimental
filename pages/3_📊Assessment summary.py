@@ -31,7 +31,6 @@ try:
       (manual_eval_df['manual_eval']==True)&
       (manual_eval_df['manual_eval_completed']==True)]
     manual_results_df['Model']='Manual assessment'
-
     assessment_result_frames['Manual assessment'] = manual_results_df
 
     # Add plots / tables to page
