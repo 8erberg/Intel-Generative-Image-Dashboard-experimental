@@ -2,6 +2,7 @@
 
 import streamlit as st
 import pandas as pd
+import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -41,6 +42,19 @@ def prompt_to_csv(df):
     return df_download.to_csv().encode('utf-8')
 
 ##### Manual assessment
+
+def delete_last_manual_rating():
+    '''
+    Routine to delete last manual rating and hence to return to it
+    '''
+    if len(st.session_state['manual_rating_history'])>0:
+        if st.button('Return to last rated image'):
+            deleted_picture_index = st.session_state['manual_rating_history'].pop()
+            st.session_state['eval_df'].loc[
+                deleted_picture_index,'manual_eval_completed']=False
+            st.session_state['eval_df'].loc[
+                deleted_picture_index,'manual_eval_task_score']=np.nan  
+            st.experimental_rerun() 
 
 def add_previous_manual_assessments():
     '''
