@@ -48,12 +48,15 @@ def delete_last_manual_rating():
     Routine to delete last manual rating and hence to return to it
     '''
     if len(st.session_state['manual_rating_history'])>0:
+
         if st.button('Return to last rated image'):
-            deleted_picture_index = st.session_state['manual_rating_history'].pop()
-            st.session_state['eval_df'].loc[
-                deleted_picture_index,'manual_eval_completed']=False
-            st.session_state['eval_df'].loc[
-                deleted_picture_index,'manual_eval_task_score']=np.nan  
+            # The list contains sublists of images rated together, here we loop over these images to reset all of them
+            deleted_picture_index_list = st.session_state['manual_rating_history'].pop()
+            for i_picind in deleted_picture_index_list:
+                st.session_state['eval_df'].loc[
+                    i_picind,'manual_eval_completed']=False
+                st.session_state['eval_df'].loc[
+                    i_picind,'manual_eval_task_score']=np.nan  
             st.experimental_rerun() 
 
 def add_previous_manual_assessments():

@@ -4,6 +4,7 @@ import pandas as pd
 from PIL import Image
 from pages.Functions.Dashboard_functions import add_previous_manual_assessments, delete_last_manual_rating
 
+
 st.title('Manual assessment')
 st.write('On this page you can rate all uploaded images with regards to how good they match their respective prompts. You can see the outcome of your assessment on the summary page.')
 st.write(' ')
@@ -121,6 +122,9 @@ if manual_eval_available > 0:
         # Submit assessments to database
         submitted = st.form_submit_button("Submit")
         if submitted:
+            # Create temporary list to hold picture indexes for this run
+            temp_picture_index_list = []
+
             # First add main prompt assessment
             st.session_state['eval_df'].loc[
                 curr_picture_index,'manual_eval']=include_prompt
@@ -129,8 +133,8 @@ if manual_eval_available > 0:
             st.session_state['eval_df'].loc[
                 curr_picture_index,'manual_eval_task_score']=curr_manual_eval_row['manual_eval_task_score'].item()       
 
-            # Add picture index to rating history
-            st.session_state['manual_rating_history'].append(curr_picture_index)
+            # Add picture index to temp list
+            temp_picture_index_list.append(curr_picture_index)
 
             # Add subprompt assessment if dataset was created for subprompts
             # This stage will automatically be skipped if the df for linked prompts is empty
@@ -141,6 +145,12 @@ if manual_eval_available > 0:
                     row.Picture_index,'manual_eval_completed']=True
                 st.session_state['eval_df'].loc[
                     row.Picture_index,'manual_eval_task_score']=row.manual_eval_task_score
+
+                # Add picture index to temp list
+                temp_picture_index_list.append(row.Picture_index)
+
+            # Add temp list of picture indices to rating history
+            st.session_state['manual_rating_history'].append(temp_picture_index_list)
 
             # Reset page after ratings were submitted
             st.experimental_rerun()
@@ -159,5 +169,4 @@ else:
     assessment_progress.write('You finished assessing the current batch of uploaded images. Upload more pictures of generate your results on the summary page.')
     # Add option to return to last manual rating
     delete_last_manual_rating()
-
 
