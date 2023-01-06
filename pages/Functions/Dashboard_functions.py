@@ -162,6 +162,7 @@ def multi_comparison_plotI(results_df = None, uploaded_df_list = []):
     sns.barplot(data=eval_share,x='Task',y='Percentage correct',hue='Model', palette='GnBu')
     plt.xticks(rotation=-65)
     plt.xlabel(' ')
+    plt.ylim(0, 100)
     return fig,grouped_series
 
 
