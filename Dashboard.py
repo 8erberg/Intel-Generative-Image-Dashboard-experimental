@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd 
 import numpy as np 
 from Dashboard_setup import prompt_dir, automated_task_list
-from pages.Functions.Dashboard_functions import prompt_to_csv
+from pages.Functions.Dashboard_functions import prompt_to_csv, prompt_df_for_download
 
 # Setup
 ## Add prompt directory to session state
@@ -21,41 +21,13 @@ st.subheader('User guide')
 st.write('To assess a generative image algorithm, download a set of prompts using the prompt downloader below. Generate one image per prompt and use the file names provided to name your images. Upload these generated images in the data upload section below. The pages for manual assessment and automated assessment allow you to systematically assess the generated images. The results will be presented and ready for download on the assessment summary page.')
 st.sidebar.image('assets/IL_Logo.png')
 
-# Add prompt downloading functions
-prompt_download_dict = {}
-## Count how many prompts are in database to allow for max value in selection
-prompt_task_count = prompt_dir.Task.value_counts(sort=False)
-prompt_task_count = prompt_task_count.drop(index='Single object')
-prompt_task_select = prompt_task_count.copy()
-## Hide downloader in box
+
+## Add prompt downloading routine in expander box
 with st.expander("Prompt downloader"):
     st.write('Select the number of prompts you want to download for each task category. The set of prompts will automatically also include all single objects appearing in the selected prompts.')
-    # Create numerical selector for every task in prompt directory
-    for i_task in prompt_task_select.index:
-        prompt_task_select[i_task] = st.number_input(
-            i_task,
-            value = prompt_task_count[i_task], 
-            max_value=prompt_task_count[i_task],
-            min_value=0,
-            step = 1)
 
-    # Create df with selected number of prompts per task
-    for i_task in prompt_task_select.index:
-        temp_df = prompt_dir.loc[prompt_dir['Task']==i_task][0:prompt_task_select[i_task]]
-        if len(temp_df)>0:
-            prompt_download_dict[i_task]=temp_df
-
-    # Concat all tasks to dataframe
-    prompt_download = pd.concat(prompt_download_dict.values())
-    # Exclude prompts from single object prompt download, as else the int transform gives an error
-    single_object_prompt_download = prompt_download.dropna(subset='Linked_prompts')
-
-    # Add relevant single object prompts
-    single_object_ids = single_object_prompt_download.Linked_prompts.str.split(',').explode().unique().astype('int')
-    prompt_download = pd.concat([
-       prompt_download,
-       prompt_dir.loc[prompt_dir['ID'].isin(single_object_ids)] 
-    ])
+    # Add elements to allow user to select count of prompts per task
+    prompt_download = prompt_df_for_download(prompt_dir)
 
     # For img2img prompt, the prompt in the download gets replaced by img2img instructions
     img2img_instructions_col = prompt_download.loc[prompt_download['Task'].str.startswith('img2img')]['img2img_instructions']
@@ -97,8 +69,6 @@ with st.form("my-form", clear_on_submit=True):
 
         submitted = st.form_submit_button("Add images")
         st.session_state['uploaded_img'] = st.session_state['uploaded_img']+uploaded_files
-
-
 
 # Add new uploaded images to session state
 ## Try to append it to pre-existing list, else create new list in session state
@@ -149,6 +119,5 @@ if eval_df.shape[0]!=0:
 
     if eval_df.shape[0]>sum(eval_df.manual_eval):
         st.write('WARNING: {0} image(s) with invalid file names uploaded. Pictures with invalid names will not be available for assessment. Use the file names provided by the prompt downloader to correctly name your generated images.'.format(str(eval_df.shape[0]-sum(eval_df.manual_eval))))
-
 else:
     st.write("Upload files to start the assessment.")

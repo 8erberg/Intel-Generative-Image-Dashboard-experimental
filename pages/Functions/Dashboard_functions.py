@@ -52,6 +52,55 @@ def prompt_to_csv(df):
     df_download = df[['Prompt','Filename']].drop_duplicates(subset='Filename')
     return df_download.to_csv().encode('utf-8')
 
+def prompt_df_for_download(prompt_dir):
+    '''
+    Function to create a subset of the prompt_dir via count based selection
+    '''
+    # Create local copy of variables
+    temp_prompt_dir = prompt_dir
+
+    # Create dict to hold counts of downloaded prompts
+    prompt_download_dict = {}
+    ## Count how many prompts are in database to allow for max value in selection
+    prompt_task_count = temp_prompt_dir.Task.value_counts(sort=False)
+    prompt_task_select = prompt_task_count.copy()
+
+    # Create numerical selector for every task in prompt directory, add count per task to dict
+    for i_task in prompt_task_select.index:
+        prompt_task_select[i_task] = st.number_input(
+            i_task,
+            value = prompt_task_count[i_task], 
+            max_value=prompt_task_count[i_task],
+            min_value=0,
+            step = 1)
+
+    # Create df with selected number of prompts per task
+    for i_task in prompt_task_select.index:
+        temp_df = temp_prompt_dir.loc[temp_prompt_dir['Task']==i_task][0:prompt_task_select[i_task]]
+        if len(temp_df)>0:
+            prompt_download_dict[i_task]=temp_df
+
+    # Concat all tasks to dataframe
+    prompt_download = pd.concat(prompt_download_dict.values())
+
+    # Add linked prompts, if the user chooses to
+    download_linked_prompts = st.checkbox('Download linked prompts', value=True)
+    if download_linked_prompts:
+
+        # Delete rows which do not have linked prompts to avoid type error
+        linked_prompts_info = prompt_download.dropna(subset='Linked_prompts')
+
+        # Add relevant linked prompts
+        linked_prompts_ids = linked_prompts_info.Linked_prompts.str.split(',').explode().unique().astype('int')
+        prompt_download = pd.concat(
+            [prompt_download,
+            temp_prompt_dir.loc[temp_prompt_dir['ID'].isin(linked_prompts_ids)]])
+
+        # Drop rows prompts which appear twice
+        prompt_download = prompt_download.drop_duplicates(subset='ID')
+
+    return prompt_download
+
 ##### Manual assessment
 
 def delete_last_manual_rating(session_history, eval_df):
