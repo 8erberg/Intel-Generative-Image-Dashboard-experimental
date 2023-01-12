@@ -1,4 +1,7 @@
 import pandas as pd 
 
+# List of tasks which are automated in current version - note that each of these needs a corresponding evaluation function in Dashboard_automation_setup.py
 automated_task_list = ['Multiple object types', 'Single object','Negation','Numbers (multiple objects)','Simple arithmetic']
-prompt_dir = pd.read_csv('Data/Prompt_dir_230109.csv')
+
+# Import the list of prompts used in current version
+prompt_dir = pd.read_csv('data/Prompt_dir_230110.csv')
