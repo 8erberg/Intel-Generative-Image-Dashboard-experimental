@@ -66,10 +66,6 @@ if manual_eval_available > 0:
     curr_prompt_ID = int(curr_manual_eval_row.Prompt_no.item())
     curr_prompt_row =st.session_state['prompt_dir'].loc[st.session_state['prompt_dir']['ID']==curr_prompt_ID]
 
-
-
-    st.write(curr_manual_eval_row.manual_eval_task_score.item())
-
     # Extract information about linked subprompts
     curr_linked_prompts = curr_prompt_row.Linked_prompts.item()
 
@@ -99,7 +95,6 @@ if manual_eval_available > 0:
 
         # Preselected radio option
         radio_preselect = radio_rating_index_translation(curr_manual_eval_row.manual_eval_task_score.item())
-        st.write(radio_preselect)
 
         curr_manual_eval_row['manual_eval_task_score'] = st.radio(
                 "Does the image match the prompt?",('Yes', 'No'), horizontal=True, key='base', index=radio_preselect)
@@ -120,6 +115,9 @@ if manual_eval_available > 0:
 
         # Create rating for subprompts if a df for subprompt info was created
         for row in curr_linked_rows.itertuples():
+            #st.write(row)
+            # Preselected radio option
+            radio_preselect = radio_rating_index_translation(row.manual_eval_task_score)
             # Prompt
             st.write('Prompt: {0}'.format(
                 curr_prompt_dir.loc[curr_prompt_dir['ID']==int(row.Index)]['Prompt'].item()
@@ -128,7 +126,7 @@ if manual_eval_available > 0:
             st.image(st.session_state['uploaded_img'][row.Picture_index],width=350)
             # Rating
             curr_linked_rows.loc[curr_linked_rows['Picture_index']==row.Picture_index,'manual_eval_task_score'] = st.radio(
-                "Does the image match the prompt?",('Yes', 'No'), horizontal=True, key=row.Picture_index)
+                "Does the image match the prompt?",('Yes', 'No'), horizontal=True, key=row.Picture_index, index=radio_preselect)
             st.write(' ')
             st.write(' ')
         
