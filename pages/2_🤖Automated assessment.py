@@ -9,6 +9,7 @@ st.write('On this page you can use automated assessment algorithms to assess how
 st.write(' ')
 st.sidebar.image('assets/IL_Logo.png')
 
+###### Setup of variables ############################
 try:
     # Create necessary variables
     prompt_dir = st.session_state['prompt_dir']
@@ -29,6 +30,7 @@ except KeyError:
     automated_eval_available = 0
 
 
+###### Rating loop ############################
 # If images for assessment available: create form to start assessment
 # Else: Note to upload images for assessment
 if automated_eval_available > 0:

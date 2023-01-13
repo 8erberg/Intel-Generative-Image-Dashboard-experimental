@@ -4,7 +4,16 @@ import numpy as np
 from Dashboard_setup import prompt_dir, automated_task_list
 from pages.Functions.Dashboard_functions import prompt_to_csv, prompt_df_for_download
 
-# Setup
+# Page
+st.title('Generative Image Benchmark')
+st.write('This is an evaluation platform to assess the performance of image generation algorithms developed by Intel Labs. This is the alpha version of the platform.')
+st.subheader('User guide')
+st.write('To assess a generative image algorithm, download a set of prompts using the prompt downloader below. Generate one image per prompt and use the file names provided to name your images. Upload these generated images in the data upload section below. The pages for manual assessment and automated assessment allow you to systematically assess the generated images. The results will be presented and ready for download on the assessment summary page.')
+st.sidebar.image('assets/IL_Logo.png')
+
+
+
+###### Setup of variables ############################
 ## Add prompt directory to session state
 st.session_state['prompt_dir'] = prompt_dir
 ## Create lists of prompts for manual and automated assessments
@@ -14,14 +23,23 @@ automated_prompts = prompt_dir.loc[
     (prompt_dir['Task']).isin(st.session_state['automated_tasks'])].ID.tolist()
 manual_prompts = prompt_dir.ID.tolist()
 
-# Page
-st.title('Generative Image Benchmark')
-st.write('This is an evaluation platform to assess the performance of image generation algorithms developed by Intel Labs. This is the alpha version of the platform.')
-st.subheader('User guide')
-st.write('To assess a generative image algorithm, download a set of prompts using the prompt downloader below. Generate one image per prompt and use the file names provided to name your images. Upload these generated images in the data upload section below. The pages for manual assessment and automated assessment allow you to systematically assess the generated images. The results will be presented and ready for download on the assessment summary page.')
-st.sidebar.image('assets/IL_Logo.png')
+# Generate empty dataset for results, if it does not exist yet
+try:
+    num_uploaded_images = st.session_state['eval_df'].shape[0]
+except KeyError:
+    st.session_state['eval_df'] = pd.DataFrame(
+        columns=['File_name','Prompt_no','automated_eval','manual_eval','manual_eval_completed','manual_eval_task_score'])
+    st.session_state['uploaded_img'] = []
+
+# Create dic for automated asssssment if it does not excist yet
+try:
+    test_dict = st.session_state['results_dict']
+except KeyError:
+    st.session_state['results_dict'] = {}
 
 
+
+###### Prompt downloader ############################
 ## Add prompt downloading routine in expander box
 with st.expander("Prompt downloader"):
     st.write('Select the number of prompts you want to download for each task category. The set of prompts will automatically also include all single objects appearing in the selected prompts.')
@@ -42,22 +60,9 @@ with st.expander("Prompt downloader"):
     )
 
 
-# Generate empty dataset for results, if it does not exist yet
-try:
-    num_uploaded_images = st.session_state['eval_df'].shape[0]
-except KeyError:
-    st.session_state['eval_df'] = pd.DataFrame(
-        columns=['File_name','Prompt_no','automated_eval','manual_eval','manual_eval_completed','manual_eval_task_score'])
-    st.session_state['uploaded_img'] = []
-
-# Create dic for automated asssssment if it does not excist yet
-try:
-    test_dict = st.session_state['results_dict']
-except KeyError:
-    st.session_state['results_dict'] = {}
 
 
-# Data upload setup
+###### Data uploader and eval_df creation ############################
 st.subheader('Data upload')
 #uploaded_files = st.file_uploader('Upload generated images', accept_multiple_files=True)
 with st.form("my-form", clear_on_submit=True):
@@ -109,6 +114,7 @@ if len(uploaded_files) != 0:
         st.session_state['uploaded_img'] = uploaded_files
 
 
+###### Upload status visualisation ############################
 eval_df = st.session_state['eval_df']
 if eval_df.shape[0]!=0:
     # Print current state of uploaded data

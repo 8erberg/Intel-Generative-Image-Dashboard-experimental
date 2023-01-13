@@ -14,12 +14,12 @@ def convert_df_to_csv(df):
   return df[['File_name','Prompt_no','Task','Score']].to_csv().encode('utf-8')
 
 assessment_result_frames = {}
-
-
 st.title('Assessment Summary')
+
+
+
+###### Manual assessment visualisation ############################
 st.header('Manual assessment')
-
-
 try:
   if sum(st.session_state['eval_df']['manual_eval_completed'])>0:
     # Display file uploader
@@ -47,6 +47,8 @@ try:
 except KeyError:
   pre_assessment_visualisation(type_str='manual')
 
+
+###### Automated assessment visualisation ############################
 st.write(' ')
 st.header('Automated assessment')
 try:
@@ -71,6 +73,8 @@ except KeyError:
   pre_assessment_visualisation(type_str='automated')
 
 
+
+###### Gallery ############################
 try:
   # Start gallery
   st.header('Assessment gallery')
