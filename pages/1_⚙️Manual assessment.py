@@ -4,6 +4,11 @@ import pandas as pd
 from PIL import Image
 from pages.Functions.Dashboard_functions import add_previous_manual_assessments, delete_last_manual_rating, if_true_rerun
 
+def radio_rating_index_translation(manual_rating_value):
+    if manual_rating_value == "No":
+        return 1
+    else:
+        return 0 
 
 st.title('Manual assessment')
 st.write('On this page you can rate all uploaded images with regards to how good they match their respective prompts. You can see the outcome of your assessment on the summary page.')
@@ -61,6 +66,10 @@ if manual_eval_available > 0:
     curr_prompt_ID = int(curr_manual_eval_row.Prompt_no.item())
     curr_prompt_row =st.session_state['prompt_dir'].loc[st.session_state['prompt_dir']['ID']==curr_prompt_ID]
 
+
+
+    st.write(curr_manual_eval_row.manual_eval_task_score.item())
+
     # Extract information about linked subprompts
     curr_linked_prompts = curr_prompt_row.Linked_prompts.item()
 
@@ -87,8 +96,13 @@ if manual_eval_available > 0:
         
         # Show image of current prompt and rating
         st.image(st.session_state['uploaded_img'][curr_manual_eval_row.Picture_index.item()],width=350)
+
+        # Preselected radio option
+        radio_preselect = radio_rating_index_translation(curr_manual_eval_row.manual_eval_task_score.item())
+        st.write(radio_preselect)
+
         curr_manual_eval_row['manual_eval_task_score'] = st.radio(
-                "Does the image match the prompt?",('Yes', 'No'), horizontal=True, key='base')
+                "Does the image match the prompt?",('Yes', 'No'), horizontal=True, key='base', index=radio_preselect)
 
         st.write(' ') # Create whitespace
         st.write(' ') # Create whitespace
@@ -155,7 +169,7 @@ if manual_eval_available > 0:
             # Reset page after ratings were submitted
             st.experimental_rerun()
 
-    # Delete the last manual rating - this deletes the last set if multiple images were rated simultaneously
+    # Allow user to return to last manual rating
     st.session_state['manual_rating_history'],st.session_state['eval_df'], bool_rating_deleted = delete_last_manual_rating(
         st.session_state['manual_rating_history'],st.session_state['eval_df'])
     if_true_rerun(bool_rating_deleted)
@@ -170,6 +184,10 @@ elif len(st.session_state['uploaded_img'])==0:
 # If files are uploaded but all ratings are completed
 else:
     assessment_progress.write('You finished assessing the current batch of uploaded images. Upload more pictures of generate your results on the summary page.')
-    # Add option to return to last manual rating
-    delete_last_manual_rating()
 
+    # Allow user to return to last manual rating
+    st.session_state['manual_rating_history'],st.session_state['eval_df'], bool_rating_deleted = delete_last_manual_rating(
+        st.session_state['manual_rating_history'],st.session_state['eval_df'])
+    if_true_rerun(bool_rating_deleted)
+
+st.session_state['eval_df']

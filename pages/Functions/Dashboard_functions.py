@@ -119,10 +119,11 @@ def delete_last_manual_rating(session_history, eval_df):
             for i_picind in deleted_picture_index_list:
                 temp_eval_df.loc[
                     i_picind,'manual_eval_completed']=False
-                temp_eval_df.loc[
-                    i_picind,'manual_eval_task_score']=np.nan  
+                #temp_eval_df.loc[
+                #    i_picind,'manual_eval_task_score']=np.nan  
             
             # Set submit boolean to true, to rerun the page
+            temp_submit = True
     
     return temp_session_history, temp_eval_df, temp_submit
      
