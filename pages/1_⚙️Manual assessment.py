@@ -2,7 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 from PIL import Image
-from pages.Functions.Dashboard_functions import add_previous_manual_assessments, delete_last_manual_rating, if_true_rerun, radio_rating_index_translation
+from pages.Functions.Dashboard_functions import add_previous_manual_assessments, delete_last_manual_rating, if_true_rerun, radio_rating_index_translation, set_eval_df_rating_vals
 
 
 st.title('Manual assessment')
@@ -134,12 +134,13 @@ if manual_eval_available > 0:
             temp_picture_index_list = []
 
             # First add main prompt assessment
-            st.session_state['eval_df'].loc[
-                curr_picture_index,'manual_eval']=include_prompt
-            st.session_state['eval_df'].loc[
-                curr_picture_index,'manual_eval_completed']=True
-            st.session_state['eval_df'].loc[
-                curr_picture_index,'manual_eval_task_score']=curr_manual_eval_row['manual_eval_task_score'].item()       
+            st.session_state['eval_df'] = set_eval_df_rating_vals(
+                st.session_state['eval_df'],
+                picture_index=curr_picture_index,
+                manual_eval=include_prompt,
+                manual_eval_completed=True,
+                manual_eval_task_score=curr_manual_eval_row['manual_eval_task_score'].item() 
+            )       
 
             # Add picture index to temp list
             temp_picture_index_list.append(curr_picture_index)
@@ -147,13 +148,14 @@ if manual_eval_available > 0:
             # Add subprompt assessment if dataset was created for subprompts
             # This stage will automatically be skipped if the df for linked prompts is empty
             for row in curr_linked_rows.itertuples():
-                st.session_state['eval_df'].loc[
-                    row.Picture_index,'manual_eval']=include_prompt
-                st.session_state['eval_df'].loc[
-                    row.Picture_index,'manual_eval_completed']=True
-                st.session_state['eval_df'].loc[
-                    row.Picture_index,'manual_eval_task_score']=row.manual_eval_task_score
-
+                st.session_state['eval_df'] = set_eval_df_rating_vals(
+                    st.session_state['eval_df'],
+                    picture_index=row.Picture_index,
+                    manual_eval=include_prompt,
+                    manual_eval_completed=True,
+                    manual_eval_task_score=row.manual_eval_task_score
+                )       
+  
                 # Add picture index to temp list
                 temp_picture_index_list.append(row.Picture_index)
 
@@ -184,3 +186,5 @@ else:
     st.session_state['manual_rating_history'],st.session_state['eval_df'], bool_rating_deleted = delete_last_manual_rating(
         st.session_state['manual_rating_history'],st.session_state['eval_df'])
     if_true_rerun(bool_rating_deleted)
+
+#st.session_state['eval_df']

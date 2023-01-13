@@ -103,6 +103,16 @@ def prompt_df_for_download(prompt_dir):
 
 ##### Manual assessment
 
+def set_eval_df_rating_vals(eval_df, picture_index, manual_eval, manual_eval_completed, manual_eval_task_score):
+    '''
+    Function to set a block of key manual rating related variables of eval_df
+    '''
+    temp_eval_df = eval_df
+    temp_eval_df.loc[picture_index,'manual_eval']=manual_eval
+    temp_eval_df.loc[picture_index,'manual_eval_completed']=manual_eval_completed
+    temp_eval_df.loc[picture_index,'manual_eval_task_score']=manual_eval_task_score
+    return temp_eval_df 
+
 def radio_rating_index_translation(manual_rating_value):
     if manual_rating_value == "No":
         return 1
