@@ -2,8 +2,7 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 from PIL import Image
-from pages.Functions.Dashboard_functions import add_previous_manual_assessments, delete_last_manual_rating, if_true_rerun, radio_rating_index_translation, set_eval_df_rating_vals
-
+from pages.Functions.Dashboard_functions import add_previous_manual_assessments, delete_last_manual_rating, if_true_rerun, radio_rating_index_translation, set_eval_df_rating_vals, collect_linked_prompt_ratings
 
 st.title('Manual assessment')
 st.write('On this page you can rate all uploaded images with regards to how good they match their respective prompts. You can see the outcome of your assessment on the summary page.')
@@ -14,6 +13,7 @@ st.sidebar.image(side_image)
 assessment_header = st.empty()
 assessment_progress = st.empty()
 
+###### Setup of variables ############################
 # Extract how many images are available for manual assessment in entire uploaded dataset
 ## Set to zero if the dataset has not been created yet due to starting the app on an assessment page
 manual_eval_available = 0
@@ -36,7 +36,7 @@ except IndexError:
     pass
 
 
-# Main rating loop
+###### Rating loop ############################
 ## If images are available for rating this creates a from to submit ratings to database
 ## If subprompt option is selected, it expands the form to include these as well
 ## If no images are available it prints situation specific instructions
@@ -92,40 +92,16 @@ if manual_eval_available > 0:
         # Preselected radio option
         radio_preselect = radio_rating_index_translation(curr_manual_eval_row.manual_eval_task_score.item())
 
+        # Create rating element for main prompt
         curr_manual_eval_row['manual_eval_task_score'] = st.radio(
                 "Does the image match the prompt?",('Yes', 'No'), horizontal=True, key='base', index=radio_preselect)
 
         st.write(' ') # Create whitespace
         st.write(' ') # Create whitespace
 
-        # If there are linked prompts, create df with info
-        # Else create emtpy df which will automatically skip the rating creation for these prompts
-        # Here we do not test for (curr_eval_df['manual_eval']==True) as the curr_linked_prompts is already testing for valid prompt number and we want to ignore the exclusion for subprompts
-        if type(curr_linked_prompts)==list:
-            curr_linked_rows = curr_eval_df.loc[
-                (curr_eval_df['manual_eval_completed']==False)&
-                (curr_eval_df['Prompt_no'].isin(curr_linked_prompts))]
-            curr_linked_rows = curr_linked_rows.groupby('Prompt_no').first()
-        else:
-            curr_linked_rows = pd.DataFrame()
-
-        # Create rating for subprompts if a df for subprompt info was created
-        for row in curr_linked_rows.itertuples():
-            #st.write(row)
-            # Preselected radio option
-            radio_preselect = radio_rating_index_translation(row.manual_eval_task_score)
-            # Prompt
-            st.write('Prompt: {0}'.format(
-                curr_prompt_dir.loc[curr_prompt_dir['ID']==int(row.Index)]['Prompt'].item()
-            ))
-            # Image
-            st.image(st.session_state['uploaded_img'][row.Picture_index],width=350)
-            # Rating
-            curr_linked_rows.loc[curr_linked_rows['Picture_index']==row.Picture_index,'manual_eval_task_score'] = st.radio(
-                "Does the image match the prompt?",('Yes', 'No'), horizontal=True, key=row.Picture_index, index=radio_preselect)
-            st.write(' ')
-            st.write(' ')
-        
+        # Create elements to collect ratings on linked prompts
+        # This only happens if the current prompt has linked prompts and the user choose to show linked prompts
+        curr_linked_rows = collect_linked_prompt_ratings(curr_linked_prompts, curr_eval_df, curr_prompt_dir)
 
         # Submit assessments to database
         submitted = st.form_submit_button("Submit")
@@ -187,4 +163,4 @@ else:
         st.session_state['manual_rating_history'],st.session_state['eval_df'])
     if_true_rerun(bool_rating_deleted)
 
-#st.session_state['eval_df']
+st.session_state['eval_df']

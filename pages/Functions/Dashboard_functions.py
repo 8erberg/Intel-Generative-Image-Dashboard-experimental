@@ -119,6 +119,42 @@ def radio_rating_index_translation(manual_rating_value):
     else:
         return 0 
 
+
+def collect_linked_prompt_ratings(curr_linked_prompts, curr_eval_df, curr_prompt_dir):
+    '''
+    Create elements to collect ratings on linked prompts:
+    If there are linked prompts, create df with info
+    Else create emtpy df which will automatically skip the rating creation for these prompts
+    Here we do not test for (curr_eval_df['manual_eval']==True) as the curr_linked_prompts 
+    is already testing for valid prompt number and we want to ignore the exclusion for subprompts
+    '''
+    if type(curr_linked_prompts)==list:
+        curr_linked_rows = curr_eval_df.loc[
+            (curr_eval_df['manual_eval_completed']==False)&
+            (curr_eval_df['Prompt_no'].isin(curr_linked_prompts))]
+        curr_linked_rows = curr_linked_rows.groupby('Prompt_no').first()
+    else:
+        curr_linked_rows = pd.DataFrame()
+
+    # Create rating for subprompts if a df for subprompt info was created
+    for row in curr_linked_rows.itertuples():
+        # Preselected radio option
+        radio_preselect = radio_rating_index_translation(row.manual_eval_task_score)
+        # Prompt
+        st.write('Prompt: {0}'.format(
+            curr_prompt_dir.loc[curr_prompt_dir['ID']==int(row.Index)]['Prompt'].item()
+        ))
+        # Image
+        st.image(st.session_state['uploaded_img'][row.Picture_index],width=350)
+        # Rating
+        curr_linked_rows.loc[curr_linked_rows['Picture_index']==row.Picture_index,'manual_eval_task_score'] = st.radio(
+            "Does the image match the prompt?",('Yes', 'No'), horizontal=True, key=row.Picture_index, index=radio_preselect)
+        st.write(' ')
+        st.write(' ')
+
+    return curr_linked_rows
+
+
 def delete_last_manual_rating(session_history, eval_df):
     '''
     Routine to delete last manual rating and hence to return to it
