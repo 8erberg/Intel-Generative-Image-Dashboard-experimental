@@ -103,6 +103,12 @@ def prompt_df_for_download(prompt_dir):
 
 ##### Manual assessment
 
+def radio_rating_index_translation(manual_rating_value):
+    if manual_rating_value == "No":
+        return 1
+    else:
+        return 0 
+
 def delete_last_manual_rating(session_history, eval_df):
     '''
     Routine to delete last manual rating and hence to return to it

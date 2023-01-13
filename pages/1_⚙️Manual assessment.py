@@ -2,13 +2,8 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 from PIL import Image
-from pages.Functions.Dashboard_functions import add_previous_manual_assessments, delete_last_manual_rating, if_true_rerun
+from pages.Functions.Dashboard_functions import add_previous_manual_assessments, delete_last_manual_rating, if_true_rerun, radio_rating_index_translation
 
-def radio_rating_index_translation(manual_rating_value):
-    if manual_rating_value == "No":
-        return 1
-    else:
-        return 0 
 
 st.title('Manual assessment')
 st.write('On this page you can rate all uploaded images with regards to how good they match their respective prompts. You can see the outcome of your assessment on the summary page.')
