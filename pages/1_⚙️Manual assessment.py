@@ -88,8 +88,9 @@ if manual_eval_available > 0:
             curr_prompt_dir.loc[curr_prompt_dir['ID']==int(curr_manual_eval_row.Prompt_no.item())]['Prompt'].item()
         ))
         # Exclude prompt from rating if user chooses to
-        include_prompt = st.checkbox('Include this prompt in assessment summary', value=True)
-        
+        exclude_prompt = st.checkbox('Exclude this prompt from manual assessment', value=False)
+        include_prompt = not exclude_prompt
+
         # Show image of current prompt and rating
         st.image(st.session_state['uploaded_img'][curr_manual_eval_row.Picture_index.item()],width=350)
 
@@ -161,8 +162,9 @@ if manual_eval_available > 0:
                 # Add picture index to temp list
                 temp_picture_index_list.append(row.Picture_index)
 
-            # Add temp list of picture indices to rating history
-            st.session_state['manual_rating_history'].append(temp_picture_index_list)
+            # Add temp list of picture indices to rating history, if prompt is not excluded
+            if include_prompt:
+                st.session_state['manual_rating_history'].append(temp_picture_index_list)
 
             # Reset page after ratings were submitted
             st.experimental_rerun()
@@ -187,5 +189,3 @@ else:
     st.session_state['manual_rating_history'],st.session_state['eval_df'], bool_rating_deleted = delete_last_manual_rating(
         st.session_state['manual_rating_history'],st.session_state['eval_df'])
     if_true_rerun(bool_rating_deleted)
-
-st.session_state['eval_df']
