@@ -13,6 +13,7 @@ st.sidebar.image(side_image)
 assessment_header = st.empty()
 assessment_progress = st.empty()
 
+
 ###### Setup of variables ############################
 # Extract how many images are available for manual assessment in entire uploaded dataset
 ## Set to zero if the dataset has not been created yet due to starting the app on an assessment page
@@ -162,5 +163,3 @@ else:
     st.session_state['manual_rating_history'],st.session_state['eval_df'], bool_rating_deleted = delete_last_manual_rating(
         st.session_state['manual_rating_history'],st.session_state['eval_df'])
     if_true_rerun(bool_rating_deleted)
-
-st.session_state['eval_df']
