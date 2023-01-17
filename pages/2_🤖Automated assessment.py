@@ -58,7 +58,6 @@ if automated_eval_available > 0:
             # Create list for tasks which were selected for assessment
             selected_tasks = list(compress(task_list,task_list_selected))
 
-
             # Create dataset to loop over with assessment
             assessed_df = curr_eval_df.loc[
                     (curr_eval_df['automated_eval']==True)&
@@ -70,11 +69,11 @@ if automated_eval_available > 0:
             i_num_row = 0
             i_progress_increase = 1/num_automated_rows
             st.write('Progress of automatic evaluation:')
-            my_bar = st.progress(0)
+            auto_assessment_progress = st.progress(0)
 
             for row in assessed_df.itertuples():
                 i_num_row +=1
-                my_bar.progress(0+i_num_row*i_progress_increase)
+                auto_assessment_progress.progress(0+i_num_row*i_progress_increase)
 
                 # Apply task based classifier and safe in list
                 temp_image = Image.open(st.session_state['uploaded_img'][row.Picture_index])
@@ -84,6 +83,6 @@ if automated_eval_available > 0:
 
             assessed_df['Score']=results_column
             st.session_state['auto_eval_df']=assessed_df[['File_name','Prompt_no','Picture_index','Task','Score']]
-            st.write('Completed assessment. Access results on the summary page.')
+            st.write('Assessment completed. You can access the results on the summary page. Running a new automated assessment will override past results.')
 else:
     st.write('Upload files on dashboard starting page to start automated assessment.')
