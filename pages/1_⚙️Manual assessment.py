@@ -11,8 +11,9 @@ side_image = Image.open('assets/IL_Logo.png')
 st.sidebar.image(side_image)
 # Create placeholders for key elements
 assessment_header = st.empty()
+include_subprompts_checkbox = st.empty()
 assessment_progress = st.empty()
-
+assessment_progress_bar = st.empty()
 
 ###### Setup of variables ############################
 # Extract how many images are available for manual assessment in entire uploaded dataset
@@ -22,6 +23,7 @@ try:
     curr_eval_df = st.session_state['eval_df']
     curr_eval_df['Picture_index']=curr_eval_df.index.values
     curr_manual_eval = curr_eval_df.loc[(curr_eval_df['manual_eval']==True)&(curr_eval_df['manual_eval_completed']==False)]
+    curr_manual_eval_max = len(curr_eval_df.loc[(curr_eval_df['manual_eval']==True)])
     manual_eval_available = len(curr_manual_eval)
     curr_prompt_dir = st.session_state['prompt_dir']
 except KeyError:
@@ -44,11 +46,11 @@ except IndexError:
 if manual_eval_available > 0:
     assessment_header.subheader('Assess uploaded images')
     # Let user choose whether subprompts should be presented
-    include_subprompts = st.checkbox('Show related subprompts if available (uploaded subprompts may not be shown if images have been assessed already).', value=True)
+    include_subprompts = include_subprompts_checkbox.checkbox('Show related subprompts if available (uploaded subprompts may not be shown if images have been assessed already).', value=True)
 
-    # Update the progress statement
+    # Update the progress statement / bar
     assessment_progress.write('{0} images ready / left for assessment.'.format(manual_eval_available))
-
+    assessment_progress_bar.progress(1-manual_eval_available/curr_manual_eval_max)
 
     # Extract first example for manual assessment which is not rated yet (first meaning the lowest index, for lowest prompt number)
     ## Also extract relevant metadata of this example
