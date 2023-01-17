@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd 
 import numpy as np 
-from Dashboard_setup import prompt_dir, automated_task_list
+from Dashboard_setup import prompt_dir, automated_task_list, sidebar_information
 from pages.Functions.Dashboard_functions import prompt_to_csv, prompt_df_for_download
 
 # Page
@@ -9,7 +9,7 @@ st.title('Generative Image Benchmark')
 st.write('This is an evaluation platform to assess the performance of image generation algorithms developed by Intel Labs. This is the alpha version of the platform.')
 st.subheader('User guide')
 st.write('To assess a generative image algorithm, download a set of prompts using the prompt downloader below. Generate one image per prompt and use the file names provided to name your images. Upload these generated images in the data upload section below. The pages for manual assessment and automated assessment allow you to systematically assess the generated images. The results will be presented and ready for download on the assessment summary page.')
-st.sidebar.image('assets/IL_Logo.png')
+sidebar_information()
 
 
 

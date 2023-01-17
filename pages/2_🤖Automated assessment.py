@@ -2,12 +2,13 @@ import streamlit as st
 import numpy as np
 from itertools import compress
 from PIL import Image
+from Dashboard_setup import sidebar_information
+sidebar_information() # Move this up to be displayed before the evaluation functions are loaded
 from Dashboard_automation_setup import fun_dict
 
 st.title('Automated Assessment')
 st.write('On this page you can use automated assessment algorithms to assess how good uploaded images match their respective prompts.')
 st.write(' ')
-st.sidebar.image('assets/IL_Logo.png')
 
 ###### Setup of variables ############################
 try:

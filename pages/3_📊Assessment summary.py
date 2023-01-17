@@ -4,8 +4,8 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image
 from pages.Functions.Dashboard_functions import pre_assessment_visualisation, multi_comparison_plotI, print_results_tabs
-side_image = Image.open('assets/IL_Logo.png')
-st.sidebar.image(side_image)
+from Dashboard_setup import sidebar_information
+sidebar_information()
 
 
 @st.cache
