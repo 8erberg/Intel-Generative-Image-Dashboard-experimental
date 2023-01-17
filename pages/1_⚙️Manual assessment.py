@@ -4,6 +4,7 @@ import pandas as pd
 from PIL import Image
 from pages.Functions.Dashboard_functions import add_previous_manual_assessments, delete_last_manual_rating, if_true_rerun, radio_rating_index_translation, set_eval_df_rating_vals, collect_linked_prompt_ratings
 
+
 st.title('Manual assessment')
 st.write('On this page you can rate all uploaded images with regards to how good they match their respective prompts. You can see the outcome of your assessment on the summary page.')
 st.write(' ')

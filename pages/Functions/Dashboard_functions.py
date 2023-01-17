@@ -180,7 +180,7 @@ def delete_last_manual_rating(session_history, eval_df):
     return temp_session_history, temp_eval_df, temp_submit
      
 
-def add_previous_manual_assessments_upload(eval_df):
+def add_previous_manual_assessments_upload_back(eval_df):
     '''
     Routine to upload a dataframe of previous (manual) assessment to add it to existing database.
     The uploaded df is assessed, matching counts are printed and it returns the imported df for furthe processing.
@@ -204,6 +204,39 @@ def add_previous_manual_assessments_upload(eval_df):
             st.write('Number of matching file names found: '+ str(len(overlapping_files_df)))
             st.write('Click "Add results" button to add / override current ratings with uploaded ratings.')
 
+            return uploaded_ratings_df
+        except UnicodeDecodeError:
+            st.write('WARNING: The uploaded file has to be a .csv downloaded from the "Assessment summary" page.')
+    return temp_uploaded_ratings
+
+
+def add_previous_manual_assessments_upload(eval_df):
+    '''
+    Routine to upload a dataframe of previous (manual) assessment to add it to existing database.
+    The uploaded df is assessed, matching counts are printed and it returns the imported df for furthe processing.
+    '''
+    # Create necessary local variables
+    temp_eval_df = eval_df
+
+    # Upload single dataframe, setting default to None for code type checking
+    temp_uploaded_ratings = None
+    temp_uploaded_ratings = st.file_uploader('Select .csv for upload', accept_multiple_files=False)
+    if temp_uploaded_ratings != None:
+        try:
+            # Import the uploaded csv as dataframe
+            uploaded_ratings_df = pd.read_csv(temp_uploaded_ratings)
+            
+            # Run standard assert pipeline
+            assert_uploaded_frame(uploaded_ratings_df)
+
+            # Show matching image count and instructions
+            overlapping_files_df = pd.merge(temp_eval_df,uploaded_ratings_df,on='File_name',how='inner')
+            st.write('Number of matching file names found: '+ str(len(overlapping_files_df)))
+            ## Show warning if some of the matching images already have a rating
+            if len(overlapping_files_df.manual_eval_task_score.dropna())>0:
+                st.write('WARNING: {0} of {1} matching files already have a saved rating. These will be overriden when you click "Add results".'.format(
+                    str(len(overlapping_files_df.manual_eval_task_score.dropna())),str(len(overlapping_files_df))))
+            st.write('Click "Add results" button to add uploaded ratings to current ratings.')
             return uploaded_ratings_df
         except UnicodeDecodeError:
             st.write('WARNING: The uploaded file has to be a .csv downloaded from the "Assessment summary" page.')
