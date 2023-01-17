@@ -65,7 +65,17 @@ if automated_eval_available > 0:
                     (curr_eval_df['Task'].isin(selected_tasks))]
             results_column = []
             
+            # Add counter for progress bars
+            num_automated_rows = len(assessed_df)
+            i_num_row = 0
+            i_progress_increase = 1/num_automated_rows
+            st.write('Progress of automatic evaluation:')
+            my_bar = st.progress(0)
+
             for row in assessed_df.itertuples():
+                i_num_row +=1
+                my_bar.progress(0+i_num_row*i_progress_increase)
+
                 # Apply task based classifier and safe in list
                 temp_image = Image.open(st.session_state['uploaded_img'][row.Picture_index])
                 temp_result = fun_dict[row.Task](
