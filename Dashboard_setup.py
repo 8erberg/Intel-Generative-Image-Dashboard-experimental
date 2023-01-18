@@ -3,7 +3,7 @@ import pandas as pd
 
 # Dashboard version variables
 code_version = 'v0.0.4-dev'
-prompt_dir_version = '230110'
+prompt_dir_version = '230118'
 dashboard_version_code = code_version+'_pd'+prompt_dir_version
 
 # List of tasks which are automated in current version - note that each of these needs a corresponding evaluation function in Dashboard_automation_setup.py
