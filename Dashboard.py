@@ -4,6 +4,106 @@ import numpy as np
 from Dashboard_setup import prompt_dir, automated_task_list, sidebar_information
 from pages.Functions.Dashboard_functions import prompt_to_csv, prompt_df_for_download
 
+import streamlit as st
+import streamlit_authenticator as stauth
+import yaml
+
+
+##############
+#Auth
+
+
+
+# hashed_passwords = stauth.Hasher(['123', '456']).generate()
+# print(hashed_passwords)
+
+with open('config/auth.yaml') as file:
+    config = yaml.load(file, Loader=yaml.SafeLoader)
+
+
+authenticator = stauth.Authenticate(
+    config['credentials'],
+    config['cookie']['name'],
+    config['cookie']['key'],
+    config['cookie']['expiry_days'],
+    config['preauthorized']
+)
+
+
+# try:
+#     if authenticator.register_user('Register user', preauthorization=False):
+#         st.success('User registered successfully')
+#         with open('config/auth.yaml', 'w') as file:
+#             yaml.dump(config, file, default_flow_style=False)
+
+# except Exception as e:
+#     st.error(e)
+
+
+name, authentication_status, username = authenticator.login('Login', 'main')
+if authentication_status:
+    authenticator.logout('Logout', 'main')
+    st.write(f'Welcome *{name}*')
+    st.title('Some content')
+elif authentication_status == False:
+    st.error('Username/password is incorrect')
+elif authentication_status == None:
+    st.warning('Please enter your username and password')
+
+
+##############
+#Reset Password
+
+# try:
+#     if authenticator.reset_password(username, 'Reset password'):
+#         st.success('Password modified successfully')
+# except Exception as e:
+#     st.error(e)
+
+##############
+#Register User
+
+# try:
+#     if authenticator.register_user('Register user', preauthorization=False):
+#         st.success('User registered successfully')
+# except Exception as e:
+#     st.error(e)
+
+##############
+#Forgot Password
+
+# try:
+#     username_forgot_pw, email_forgot_password, random_password = authenticator.forgot_password('Forgot password')
+#     if username_forgot_pw:
+#         st.success('New password sent securely')
+#         # Random password to be transferred to user securely
+#     elif username_forgot_pw == False:
+#         st.error('Username not found')
+# except Exception as e:
+#     st.error(e)
+##############
+#Forgot Username
+
+# try:
+#     username_forgot_username, email_forgot_username = authenticator.forgot_username('Forgot username')
+#     if username_forgot_username:
+#         st.success('Username sent securely')
+#         # Username to be transferred to user securely
+#     elif username_forgot_username == False:
+#         st.error('Email not found')
+# except Exception as e:
+#     st.error(e)
+
+##############
+#Save Yaml
+    # reset_password, register_user, forgot_password, or update_user_details
+
+# with open('../config.yaml', 'w') as file:
+#     yaml.dump(config, file, default_flow_style=False)
+
+##############
+
+
 # Page
 st.title('Generative Image Benchmark')
 st.write('This is an evaluation platform to assess the performance of image generation algorithms developed by Intel Labs. This is the alpha version of the platform.')
