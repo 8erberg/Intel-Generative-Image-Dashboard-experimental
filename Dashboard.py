@@ -1,8 +1,11 @@
 import streamlit as st
 import pandas as pd 
 import numpy as np 
-from Dashboard_setup import prompt_dir, automated_task_list, sidebar_information
+from Dashboard_setup import prompt_dir, automated_task_list, sidebar_information, compatible_versions
 from pages.Functions.Dashboard_functions import prompt_to_csv, prompt_df_for_download
+
+#TODO: add checkup of uploaded files in manual assessment and summary page for upload
+#TODO: add version of current benchmark to downloaded results 
 
 # Page
 st.title('Generative Image Benchmark')
@@ -82,15 +85,23 @@ if len(uploaded_files) != 0:
     try:
         # Extract prompts of uploaded files
         file_names = [x.name for x in uploaded_files]
-        files_prompts = [x.split('_')[0][1:] for x in file_names]
+        files_prompts = [x.split('_',maxsplit=1)[0][1:] for x in file_names]
+        try:
+            files_versions = [x.split('_v',maxsplit=1)[1] for x in file_names]
+            files_compatible = [x.rsplit('.',1)[0] in compatible_versions for x in files_versions]
+        except IndexError:
+            files_compatible = [False]*len(files_prompts)
 
         # Create manual evaluation df
-        df_dict = {'File_name':file_names, 'Prompt_no':files_prompts}
+        df_dict = {'File_name':file_names, 'Prompt_no':files_prompts, 'File_compatible':files_compatible}
         eval_df = pd.DataFrame(df_dict)
         eval_df['automated_eval'] = eval_df['Prompt_no'].astype('int').isin(automated_prompts)
         eval_df['manual_eval'] = eval_df['Prompt_no'].astype('int').isin(manual_prompts)
         eval_df['manual_eval_completed'] = False
         eval_df['manual_eval_task_score'] = np.nan
+
+        # Set manual and automated eval = False if files are not compatible
+        eval_df.loc[eval_df['File_compatible']==False,['automated_eval','manual_eval']]=False
 
         # Exclude given percentage of uploaded images from manual assessment; with random selection
         if man_assessment_share == '50%':
@@ -125,5 +136,7 @@ if eval_df.shape[0]!=0:
 
     if eval_df.shape[0]>sum(eval_df.manual_eval):
         st.write('WARNING: {0} image(s) with invalid file names uploaded. Pictures with invalid names will not be available for assessment. Use the file names provided by the prompt downloader to correctly name your generated images.'.format(str(eval_df.shape[0]-sum(eval_df.manual_eval))))
+    if eval_df.shape[0]>sum(eval_df.File_compatible):
+        st.write('WARNING: Some of the images uploaded are not compatible with this version of benchmark software. Please go to https://github.com/8erberg/Intel-Generative-Image-Dashboard-experimental/blob/main/README.md to learn more about hosting the version compatible with your images.')
 else:
     st.write("Upload files to start the assessment.")
