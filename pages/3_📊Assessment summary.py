@@ -4,14 +4,20 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from PIL import Image
 from pages.Functions.Dashboard_functions import pre_assessment_visualisation, multi_comparison_plotI, print_results_tabs
-from Dashboard_setup import sidebar_information
+from Dashboard_setup import sidebar_information, dashboard_version_code
 sidebar_information()
 
 
-@st.cache
-def convert_df_to_csv(df):
+#@st.cache
+#def convert_df_to_csv(df):
+# IMPORTANT: Cache the conversion to prevent computation on every rerun
+#  return df[['File_name','Prompt_no','Task','Score']].to_csv().encode('utf-8')
+
+
+def df_to_csv_download(df, added_version_code='vNone'):
   # IMPORTANT: Cache the conversion to prevent computation on every rerun
-  return df[['File_name','Prompt_no','Task','Score']].to_csv().encode('utf-8')
+  df['Dashboard_version']= added_version_code
+  return df[['File_name','Prompt_no','Task','Score','Dashboard_version']].to_csv().encode('utf-8')
 
 assessment_result_frames = {}
 st.title('Assessment Summary')
@@ -38,7 +44,7 @@ try:
 
     st.download_button(
       label="Download manual assessment data",
-      data=convert_df_to_csv(manual_results_df),
+      data=df_to_csv_download(manual_results_df, added_version_code=dashboard_version_code),
       file_name='manual_assessment.csv',
       mime='text/csv',
     )
@@ -65,7 +71,7 @@ try:
 
   st.download_button(
     label="Download automated assessment data",
-    data=convert_df_to_csv(auto_eval_df),
+    data=df_to_csv_download(auto_eval_df, added_version_code=dashboard_version_code),
     file_name='automated_assessment.csv',
     mime='text/csv',
   )

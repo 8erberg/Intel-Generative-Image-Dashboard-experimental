@@ -30,7 +30,8 @@ def assert_uploaded_frame(uploaded_df):
     asserted_column_names = ['Prompt_no','Score','Task','File_name']
 
     # Check whether all needed column names are present
-    existing_column_names = [(x in uploaded_df.columns) for x in asserted_column_names]
+    df_columns_list = uploaded_df.columns.tolist()
+    existing_column_names = [(x in df_columns_list) for x in asserted_column_names]
     assert all(existing_column_names), "The uploaded dataframe is missing a column needed for import. Your table needs to contain the columns: 'Prompt_no', 'Score', 'Task', 'File_name' "
 
     # Check whether all needed columns have correct dtypes
@@ -46,9 +47,9 @@ def assert_multi_frame_upload(list_of_uploaded_dfs):
         assert_uploaded_frame(i_df)
 
 ##### Dashboard main page
-def prompt_to_csv(df):
+def prompt_to_csv(df, added_version_code='vNone'):
     df_download = df
-    df_download['Filename']='p'+df_download['ID'].astype('str')+'_1.png'
+    df_download['Filename']='p'+df_download['ID'].astype('str')+'_1_'+added_version_code+'.png'
     df_download = df[['Prompt','Filename']].drop_duplicates(subset='Filename')
     return df_download.to_csv().encode('utf-8')
 
@@ -210,7 +211,7 @@ def add_previous_manual_assessments_upload_back(eval_df):
     return temp_uploaded_ratings
 
 
-def add_previous_manual_assessments_upload(eval_df):
+def add_previous_manual_assessments_upload(eval_df, dashboard_version_code='vNone'):
     '''
     Routine to upload a dataframe of previous (manual) assessment to add it to existing database.
     The uploaded df is assessed, matching counts are printed and it returns the imported df for furthe processing.
@@ -228,6 +229,12 @@ def add_previous_manual_assessments_upload(eval_df):
             
             # Run standard assert pipeline
             assert_uploaded_frame(uploaded_ratings_df)
+
+            # Check the uploaded df has a registered dashboard version
+            assert 'Dashboard_version' in uploaded_ratings_df.columns,"The uploaded dataframe needs to have a Dashboard_version column."
+            # Check for correct dashboard version in uploaded file
+            matching_dashboard_version = uploaded_ratings_df['Dashboard_version'] == dashboard_version_code
+            assert all(matching_dashboard_version),"The dashboard version of your uploaded results does not match the version of this dashboard."
 
             # Show matching image count and instructions
             overlapping_files_df = pd.merge(temp_eval_df,uploaded_ratings_df,on='File_name',how='inner')
@@ -265,7 +272,7 @@ def add_previous_manual_assessments_submit(eval_df, uploaded_ratings):
     return temp_eval_df, temp_submitted
 
 
-def add_previous_manual_assessments(eval_df):
+def add_previous_manual_assessments(eval_df, dashboard_version_code):
     '''
     Full routine to allow the user to upload past ratings and add these to eval_df
     '''
@@ -276,7 +283,7 @@ def add_previous_manual_assessments(eval_df):
     temp_eval_df = eval_df
 
     # Allow user to upload .csv with prior ratings
-    uploaded_ratings = add_previous_manual_assessments_upload(temp_eval_df)
+    uploaded_ratings = add_previous_manual_assessments_upload(temp_eval_df, dashboard_version_code)
 
     # Add rating to eval_df, if some were uploaded
     temp_eval_df, temp_submitted = add_previous_manual_assessments_submit(temp_eval_df, uploaded_ratings)

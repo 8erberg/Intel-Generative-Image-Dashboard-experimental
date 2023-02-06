@@ -1,11 +1,10 @@
 import streamlit as st
 import pandas as pd 
 import numpy as np 
-from Dashboard_setup import prompt_dir, automated_task_list, sidebar_information, compatible_versions
+from Dashboard_setup import prompt_dir, automated_task_list, sidebar_information, compatible_versions, dashboard_version_code
 from pages.Functions.Dashboard_functions import prompt_to_csv, prompt_df_for_download
 
-#TODO: add checkup of uploaded files in manual assessment and summary page for upload
-#TODO: add version of current benchmark to downloaded results 
+#TODO: add checkup of uploaded files in manual assessment
 
 # Page
 st.title('Generative Image Benchmark')
@@ -57,7 +56,7 @@ with st.expander("Prompt downloader"):
     # Add download button for prompts
     st.download_button(
         label="Download prompts",
-        data=prompt_to_csv(prompt_download),
+        data=prompt_to_csv(prompt_download, added_version_code=dashboard_version_code),
         file_name='prompt_list.csv',
         mime='text/csv',
     )

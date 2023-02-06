@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 from pages.Functions.Dashboard_functions import add_previous_manual_assessments, delete_last_manual_rating, if_true_rerun, radio_rating_index_translation, set_eval_df_rating_vals, collect_linked_prompt_ratings
-from Dashboard_setup import sidebar_information
+from Dashboard_setup import sidebar_information, dashboard_version_code
 
 st.title('Manual assessment')
 st.write('On this page you can rate all uploaded images with regards to how good they match their respective prompts. You can see the outcome of your assessment on the summary page.')
@@ -151,7 +151,7 @@ if manual_eval_available > 0:
     if_true_rerun(bool_rating_deleted)
 
     # Allow user to upload past ratings and add them to eval_df
-    st.session_state['eval_df'], bool_ratings_uploaded = add_previous_manual_assessments(st.session_state['eval_df'])
+    st.session_state['eval_df'], bool_ratings_uploaded = add_previous_manual_assessments(st.session_state['eval_df'],dashboard_version_code=dashboard_version_code)
     if_true_rerun(bool_ratings_uploaded)
 
 # If no files are uploaded
