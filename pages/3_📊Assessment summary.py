@@ -115,6 +115,7 @@ try:
   curr_Prompt = curr_prompt_dir[curr_prompt_dir['ID']==int(curr_Prompt_no)].Prompt
   curr_Picture_index = gallery_row_print.Picture_index.item()
   # Plot prompt and image
+  st.write('File name: '+gallery_row_print.File_name)
   st.write('Prompt: '+curr_Prompt.item())
   st.image(st.session_state['uploaded_img'][curr_Picture_index],width=350)
 
