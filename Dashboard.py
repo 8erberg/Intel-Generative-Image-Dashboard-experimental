@@ -4,7 +4,6 @@ import numpy as np
 from Dashboard_setup import prompt_dir, automated_task_list, sidebar_information, compatible_versions, dashboard_version_code
 from pages.Functions.Dashboard_functions import prompt_to_csv, prompt_df_for_download
 
-#TODO: add checkup of uploaded files in manual assessment
 
 # Page
 st.title('Generative Image Benchmark')
