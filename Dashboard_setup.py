@@ -2,9 +2,9 @@ import streamlit as st
 import pandas as pd 
 
 # Dashboard version variables
-code_version = 'v0.0.4-dev'
-prompt_dir_version = '230118'
-compatible_versions = ['0.0.4-dev_pd230118', 'None']
+code_version = 'v0.0.5'
+prompt_dir_version = '230131'
+compatible_versions = ['0.0.5_pd230118', 'None']
 dashboard_version_code = code_version+'_pd'+prompt_dir_version
 
 # List of tasks which are automated in current version - note that each of these needs a corresponding evaluation function in Dashboard_automation_setup.py
