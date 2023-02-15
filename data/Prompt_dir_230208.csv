@@ -905,7 +905,7 @@
 903,904,"A map with the legend ""North, South, East, West"" written on it",map,False,Text rendering,"North, South, East, West",,2150
 904,905,"A menu at a restaurant that has the dish ""Sushi"" listed",menu,False,Text rendering,Sushi,,2148
 905,906,"A train with the destination ""Grand Central Station"" written on the front",train,False,Text rendering,Grand Central Station,,1912
-906,907,"A book with the title ""Moby-Dick"" written on the cover",book,False,Text rendering,Moby-Dick,,1924
+906,907,"A book with the title ""Vegan Recipes"" written on the cover",book,False,Text rendering,Vegan Recipes,,1924
 907,908,"A menu at a restaurant that has the dish ""Spaghetti Carbonara"" listed",menu,False,Text rendering,Spaghetti Carbonara,,2148
 908,909,"A laptop with a sticker that says ""Microsoft Windows 10""",laptop,False,Text rendering,Microsoft Windows 10,,1935
 909,910,"A plane with the destination ""London Heathrow Airport"" written on the front",plane,False,Text rendering,London Heathrow Airport,,2103
